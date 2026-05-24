@@ -56,6 +56,10 @@ export default defineNuxtConfig({
     },
   },
 
+  sourcemap: {
+    client: 'hidden',
+  },
+
   future: {
     compatibilityVersion: 4,
   },
@@ -96,6 +100,6 @@ export default defineNuxtConfig({
   },
 
   turnstile: {
-    siteKey: '',
+    siteKey: process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY ?? '',
   },
 })

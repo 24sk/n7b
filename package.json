@@ -15,7 +15,10 @@
     "typecheck": "nuxt typecheck",
     "check:bem": "node scripts/check-bem.mjs",
     "check:tokens": "node scripts/check-design-tokens.mjs",
-    "check:all": "pnpm lint && pnpm check:bem && pnpm check:tokens"
+    "check:all": "pnpm lint && pnpm check:bem && pnpm check:tokens",
+    "images:optimize": "node scripts/optimize-product-images.mjs",
+    "product:add": "tsx --env-file-if-exists=.env scripts/add-product.ts",
+    "stripe:seed": "tsx --env-file-if-exists=.env scripts/seed-stripe-products.ts"
   },
   "dependencies": {
     "@notionhq/client": "^5.22.0",
@@ -28,19 +31,24 @@
     "@sentry/nuxt": "^10.53.1",
     "nuxt": "^4.0.0",
     "resend": "^6.12.3",
+    "stripe": "^22.1.1",
     "vue": "^3.5.0",
     "vue-router": "^5.0.7",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.0.0",
+    "@anthropic-ai/sdk": "^0.98.0",
     "@nuxt/eslint": "^1.0.0",
     "@nuxt/hints": "^1.1.2",
     "better-sqlite3": "^12.10.0",
     "eslint": "^9.0.0",
     "eslint-plugin-format": "^2.0.1",
     "lefthook": "^2.1.8",
+    "openai": "^6.39.0",
     "sass-embedded": "^1.80.0",
+    "sharp": "^0.34.5",
+    "tsx": "^4.22.3",
     "typescript": "^5.6.0",
     "vue-tsc": "^3.3.1"
   },

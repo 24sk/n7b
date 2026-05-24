@@ -57,3 +57,6 @@ Thumbs.db
 
 # Nuxt Content (generated SQLite)
 .data/
+
+# 商品画像の元データ (最適化前)
+assets-raw/
