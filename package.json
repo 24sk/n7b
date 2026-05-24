@@ -18,6 +18,7 @@
     "check:all": "pnpm lint && pnpm check:bem && pnpm check:tokens"
   },
   "dependencies": {
+    "@nuxt/fonts": "^0.14.0",
     "@nuxt/ui": "^4.0.0",
     "nuxt": "^4.0.0",
     "vue": "^3.5.0",

@@ -25,6 +25,8 @@
 - [x] **0-10** Sentry 無料プランで `n7b` プロジェクト作成、DSN 取得
 
 > **方針メモ**: お問い合わせ受付・Stripe Webhook・注文通知などの自動化はコスト/初期スケールを考慮し、外部ワークフロー（n8n 等）を使わず Nuxt の server route 上で直接実装する。
+>
+> **デザイン実装方針**: ページ・コンポーネントのデザイン実装時は `@docs/デザインカンプ.png` を参照し、レイアウト・余白・配色などをこれに合わせる（細部のトークン定義は `@docs/デザインガイドライン.md`）。
 
 ### Nuxt 4 プロジェクト初期化
 
@@ -36,9 +38,9 @@
   依存: 0-13
 - [x] **0-16** `.env.example` に必要な環境変数（Stripe / Resend / Notion / Sentry / Turnstile）を列挙  
   依存: 0-13
-- [ ] **0-17** GitHub Actions で型チェック・Lint の CI を設定  
+- [x] **0-17** GitHub Actions で型チェック・Lint の CI を設定  
   依存: 0-15
-- [ ] **0-18** Vercel にデプロイし「Welcome to Nuxt」が `nango7base.jp` で表示されることを確認  
+- [x] **0-18** Vercel にデプロイし「Welcome to Nuxt」が `nango7base.jp` で表示されることを確認  
   依存: 0-4, 0-13
 
 ---
@@ -47,20 +49,20 @@
 
 ### Week 1: 基盤実装
 
-- [ ] **1-1** Tailwind CSS 導入（`@nuxtjs/tailwindcss` モジュール）  
+- [x] **1-1** Tailwind CSS 導入（Nuxt UI v4 が Tailwind v4 を内蔵するため別モジュール不要）  
   依存: 0-13
-- [ ] **1-2** デザインガイドラインのブランドカラー（teal / warm yellow 系）を `tailwind.config.ts` に定義  
+- [x] **1-2** デザインガイドラインのブランドカラー（teal / warm yellow 系）を `app/assets/css/main.css` の `@theme` に定義  
   依存: 1-1
-- [ ] **1-3** 日本語フォント（Noto Sans JP / LINE Seed JP）導入と `font-display: swap` / サブセット化設定  
+- [x] **1-3** 日本語フォント（Noto Sans JP）+ Inter を `@nuxt/fonts` で導入（`font-display: swap` / サブセット化）  
   依存: 1-1
-- [ ] **1-4** Nuxt UI 採用可否を判断し、採用する場合は導入（不採用なら独自コンポーネント方針を決定）  
+- [x] **1-4** Nuxt UI v4 を採用（CLAUDE.md / 技術スタックに準拠）  
   依存: 1-1
-- [ ] **1-5** ベースレイアウト（`layouts/default.vue`）作成
-- [ ] **1-6** Header コンポーネント実装（ロゴ、グローバルナビゲーション）  
+- [x] **1-5** ベースレイアウト（`layouts/default.vue`）作成
+- [x] **1-6** Header コンポーネント実装（ロゴ、グローバルナビゲーション）  
   依存: 1-5
-- [ ] **1-7** Footer コンポーネント実装（リンク、コピーライト、SNS）  
+- [x] **1-7** Footer コンポーネント実装（リンク、コピーライト、SNS）  
   依存: 1-5
-- [ ] **1-8** レスポンシブのブレイクポイント設計と動作確認  
+- [x] **1-8** レスポンシブのブレイクポイント設計と動作確認（Tailwind 標準 sm/md/lg/xl/2xl、`lg` でデスクトップ切替）  
   依存: 1-6, 1-7
 
 ### Week 2: 主要ページ実装（ハードコード/JSON 仮データ）

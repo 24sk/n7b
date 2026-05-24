@@ -5,7 +5,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <main class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+  <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
     <section class="space-y-6">
       <p class="text-caption font-medium text-teal-700">
         Welcome to N7B
@@ -20,5 +20,5 @@ useSeoMeta({
         N7B について
       </UButton>
     </section>
-  </main>
+  </div>
 </template>

@@ -3,6 +3,7 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxt/eslint',
+    '@nuxt/fonts',
     '@nuxt/ui',
   ],
 
@@ -36,6 +37,16 @@ export default defineNuxtConfig({
       nuxt: {
         sortConfigKeys: true,
       },
+    },
+  },
+
+  fonts: {
+    families: [
+      { name: 'Noto Sans JP', provider: 'google', weights: [400, 500, 700], subsets: ['japanese', 'latin'] },
+      { name: 'Inter', provider: 'google', weights: [400, 500, 700], subsets: ['latin'] },
+    ],
+    defaults: {
+      preload: true,
     },
   },
 })
