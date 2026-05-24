@@ -36,9 +36,9 @@
   依存: 0-13
 - [x] **0-16** `.env.example` に必要な環境変数（Stripe / Resend / Notion / Sentry / Turnstile）を列挙  
   依存: 0-13
-- [x] **0-17** GitHub Actions で型チェック・Lint の CI を設定  
+- [ ] **0-17** GitHub Actions で型チェック・Lint の CI を設定  
   依存: 0-15
-- [x] **0-18** Vercel にデプロイし「Welcome to Nuxt」が `nango7base.jp` で表示されることを確認  
+- [ ] **0-18** Vercel にデプロイし「Welcome to Nuxt」が `nango7base.jp` で表示されることを確認  
   依存: 0-4, 0-13
 
 ---

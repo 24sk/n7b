@@ -65,11 +65,11 @@
 
 ### 自動チェック (フック)
 
-| トリガ | 実行内容 | 仕組み |
-|---|---|---|
+| トリガ          | 実行内容                                            | 仕組み                                                                     |
+| --------------- | --------------------------------------------------- | -------------------------------------------------------------------------- |
 | Edit/Write 直後 | ESLint --fix + (app/ 配下なら) BEM/トークンチェック | @.claude/settings.json の PostToolUse → `.claude/hooks/post-edit-check.sh` |
-| `git commit` 前 | ESLint --fix / BEM / デザイントークン (parallel) | @lefthook.yml の pre-commit |
-| `git push` 前 | `nuxt typecheck` | @lefthook.yml の pre-push |
+| `git commit` 前 | ESLint --fix / BEM / デザイントークン (parallel)    | @lefthook.yml の pre-commit                                                |
+| `git push` 前   | `nuxt typecheck`                                    | @lefthook.yml の pre-push                                                  |
 
 違反時は exit 2 で Claude にフィードバックを返す。
 

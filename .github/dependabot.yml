@@ -5,27 +5,27 @@ updates:
     schedule:
       interval: weekly
       day: monday
-      time: "09:00"
+      time: '09:00'
       timezone: Asia/Tokyo
     open-pull-requests-limit: 10
     versioning-strategy: increase
     groups:
       nuxt:
         patterns:
-          - "nuxt"
-          - "@nuxt/*"
-          - "nitropack"
-          - "h3"
+          - nuxt
+          - '@nuxt/*'
+          - nitropack
+          - h3
       vue:
         patterns:
-          - "vue"
-          - "vue-*"
-          - "@vue/*"
+          - vue
+          - 'vue-*'
+          - '@vue/*'
       eslint:
         patterns:
-          - "eslint"
-          - "eslint-*"
-          - "@antfu/eslint-config"
+          - eslint
+          - 'eslint-*'
+          - '@antfu/eslint-config'
       minor-and-patch:
         update-types:
           - minor
@@ -36,7 +36,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
-      time: "09:00"
+      time: '09:00'
       timezone: Asia/Tokyo
     open-pull-requests-limit: 5
     groups:
