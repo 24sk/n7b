@@ -8,37 +8,37 @@
 
 ### 外部サービス・アカウント準備
 
-- [x] **0-1** ドメイン取得（`nanako7base.jp` または `n7b.jp` を Cloudflare Registrar で取得）
+- [x] **0-1** ドメイン取得（`nango7base.jp` を Cloudflare Registrar で取得）
 - [x] **0-2** GitHub プライベートリポジトリ `n7b` 作成（README / `.gitignore`(Node) / ライセンス設定）
-- [ ] **0-3** Vercel Pro で `n7b` プロジェクト作成し、GitHub リポジトリと連携  
+- [x] **0-3** Vercel Pro で `n7b` プロジェクト作成し、GitHub リポジトリと連携  
   依存: 0-2
-- [ ] **0-4** Vercel にカスタムドメインを設定（DNS レコードを Cloudflare に追加）  
+- [x] **0-4** Vercel にカスタムドメインを設定（DNS レコードを Cloudflare に追加）  
   依存: 0-1, 0-3
-- [ ] **0-5** Stripe アカウント設定（事業者情報登録、JPY 通貨設定、Konbini 決済有効化、テスト/本番モード確認）
-- [ ] **0-6** Resend アカウント作成 + 独自ドメイン認証（SPF / DKIM / DMARC を Cloudflare DNS に設定）  
+- [x] **0-5** Stripe アカウント設定（事業者情報登録、JPY 通貨設定、Konbini 決済有効化、テスト/本番モード確認）
+- [x] **0-6** Resend アカウント作成 + 独自ドメイン認証（SPF / DKIM / DMARC を Cloudflare DNS に設定）  
   依存: 0-1
-- [ ] **0-7** Resend 送信元アドレス `noreply@n7b.jp` / `contact@n7b.jp` を準備  
+- [x] **0-7** Resend 送信元アドレス `noreply@nango7base.jp` / `contact@nango7base.jp` を準備  
   依存: 0-6
-- [ ] **0-8** Notion ワークスペースに「N7B」セクション・お問い合わせ管理 DB・お知らせ管理 DB を作成
-- [ ] **0-9** Notion Integration を作成し API トークン発行、対象 DB に接続権限付与  
+- [x] **0-8** Notion ワークスペースに「N7B」セクション・お問い合わせ管理 DB・お知らせ管理 DB を作成
+- [x] **0-9** Notion Integration を作成し API トークン発行、対象 DB に接続権限付与  
   依存: 0-8
-- [ ] **0-10** Sentry 無料プランで `n7b` プロジェクト作成、DSN 取得
+- [x] **0-10** Sentry 無料プランで `n7b` プロジェクト作成、DSN 取得
 
 > **方針メモ**: お問い合わせ受付・Stripe Webhook・注文通知などの自動化はコスト/初期スケールを考慮し、外部ワークフロー（n8n 等）を使わず Nuxt の server route 上で直接実装する。
 
 ### Nuxt 4 プロジェクト初期化
 
-- [ ] **0-13** Nuxt 4 プロジェクト初期化（`nuxt@latest` で雛形作成）  
+- [x] **0-13** Nuxt 4 プロジェクト初期化（`nuxt@latest` で雛形作成）  
   依存: 0-2
-- [ ] **0-14** TypeScript の strict 設定（`tsconfig.json` / `nuxt.config.ts`）  
+- [x] **0-14** TypeScript の strict 設定（`tsconfig.json` / `nuxt.config.ts`）  
   依存: 0-13
-- [ ] **0-15** ESLint / Prettier 導入と設定  
+- [x] **0-15** ESLint / Prettier 導入と設定  
   依存: 0-13
-- [ ] **0-16** `.env.example` に必要な環境変数（Stripe / Resend / Notion / Sentry / Turnstile）を列挙  
+- [x] **0-16** `.env.example` に必要な環境変数（Stripe / Resend / Notion / Sentry / Turnstile）を列挙  
   依存: 0-13
-- [ ] **0-17** GitHub Actions で型チェック・Lint の CI を設定  
+- [x] **0-17** GitHub Actions で型チェック・Lint の CI を設定  
   依存: 0-15
-- [ ] **0-18** Vercel にデプロイし「Welcome to Nuxt」が `n7b.jp` で表示されることを確認  
+- [x] **0-18** Vercel にデプロイし「Welcome to Nuxt」が `nango7base.jp` で表示されることを確認  
   依存: 0-4, 0-13
 
 ---
@@ -81,15 +81,15 @@
 
 ### Week 3: コンテンツ運用とお問い合わせ
 
-- [ ] **1-17** Nuxt Content v3 導入  
+- [ ] **1-17** Nuxt Content v3 導入（Phase 3 の Journal・制作ストーリー用）  
   依存: 0-13
-- [ ] **1-18** `news` コレクションのスキーマ設計（タイトル、公開日、本文等）  
-  依存: 1-17
-- [ ] **1-19** お知らせ一覧ページ実装  
+- [ ] **1-18** `server/api/news.get.ts` 実装（Notion お知らせ管理 DB から公開済みレコードを取得、ISR キャッシュ 10 分）  
+  依存: 0-9
+- [ ] **1-19** お知らせ一覧ページ実装（Notion API 経由）  
   依存: 1-18
-- [ ] **1-20** お知らせ詳細ページ実装  
+- [ ] **1-20** お知らせ詳細ページ実装（Notion ページブロックを取得してレンダリング）  
   依存: 1-18
-- [ ] **1-21** トップページのお知らせセクションを Nuxt Content と接続  
+- [ ] **1-21** トップページのお知らせセクションを Notion API と接続  
   依存: 1-12, 1-18
 - [ ] **1-22** Cloudflare Turnstile 連携（サイトキー/シークレットキー取得、フォームへ組み込み）  
   依存: 1-16

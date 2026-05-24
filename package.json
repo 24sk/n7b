@@ -1,0 +1,45 @@
+{
+  "name": "n7b",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@10.30.1",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "prepare": "nuxt prepare",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint . --cache",
+    "lint:fix": "eslint . --fix --cache",
+    "typecheck": "nuxt typecheck",
+    "check:bem": "node scripts/check-bem.mjs",
+    "check:tokens": "node scripts/check-design-tokens.mjs",
+    "check:all": "pnpm lint && pnpm check:bem && pnpm check:tokens"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^4.0.0",
+    "nuxt": "^4.0.0",
+    "vue": "^3.5.0",
+    "vue-router": "^5.0.7"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^3.0.0",
+    "@nuxt/eslint": "^1.0.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-format": "^2.0.1",
+    "lefthook": "^1.7.0",
+    "sass-embedded": "^1.80.0",
+    "typescript": "^5.6.0",
+    "vue-tsc": "^3.3.1"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild",
+      "lefthook",
+      "unrs-resolver",
+      "vue-demi"
+    ]
+  }
+}

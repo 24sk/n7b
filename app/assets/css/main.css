@@ -1,0 +1,87 @@
+@import 'tailwindcss';
+@import '@nuxt/ui';
+
+/*
+  N7B Design Tokens (デザインガイドライン v1.0 準拠)
+  色名の追加・変更時は docs/デザインガイドライン.md と同期すること。
+*/
+@theme static {
+  /* Primary — Teal */
+  --color-teal-50: #f0f8f9;
+  --color-teal-100: #d4ebee;
+  --color-teal-600: #2e96a3;
+  --color-teal-700: #1a7a87;
+  --color-teal-800: #15616d;
+  --color-teal-900: #0f4a4a;
+
+  /* Accent */
+  --color-accent-yellow: #f5c842;
+
+  /* Neutral */
+  --color-neutral-50: #fafbfb;
+  --color-neutral-100: #f0f2f2;
+  --color-neutral-300: #c9d1d1;
+  --color-neutral-500: #7a8585;
+  --color-neutral-700: #3d4747;
+  --color-neutral-900: #1a1f1f;
+
+  /* Semantic */
+  --color-success: #3fa66d;
+  --color-warning: #e89f3b;
+  --color-error: #d85a4d;
+  --color-badge-new: #e85a4f;
+
+  /* Nuxt UI primary color mapping */
+  --ui-color-primary-50: var(--color-teal-50);
+  --ui-color-primary-100: var(--color-teal-100);
+  --ui-color-primary-600: var(--color-teal-600);
+  --ui-color-primary-700: var(--color-teal-700);
+  --ui-color-primary-800: var(--color-teal-800);
+  --ui-color-primary-900: var(--color-teal-900);
+
+  /* Font families */
+  --font-sans: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo', sans-serif;
+  --font-en: 'Inter', 'Noto Sans JP', sans-serif;
+
+  /* Type scale (デザインガイド 3.3) */
+  --text-hero: 3rem;
+  --text-hero--line-height: 1.4;
+  --text-h1: 2rem;
+  --text-h1--line-height: 1.4;
+  --text-h2: 1.5rem;
+  --text-h2--line-height: 1.4;
+  --text-h3: 1.125rem;
+  --text-h3--line-height: 1.5;
+  --text-body-lg: 1rem;
+  --text-body-lg--line-height: 1.7;
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.7;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.5;
+}
+
+@layer base {
+  html {
+    font-feature-settings: 'palt';
+  }
+
+  body {
+    color: var(--color-neutral-700);
+    background: var(--color-neutral-50);
+    font-family: var(--font-sans);
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--color-teal-600);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

@@ -1,0 +1,21 @@
+# https://lefthook.dev/
+# pnpm dlx lefthook install で有効化される (postinstall でも可)
+
+pre-commit:
+  parallel: true
+  commands:
+    eslint:
+      glob: '*.{js,ts,mjs,cjs,vue}'
+      run: pnpm exec eslint --fix --cache {staged_files}
+      stage_fixed: true
+    bem:
+      glob: 'app/**/*.{vue,scss}'
+      run: node scripts/check-bem.mjs
+    design-tokens:
+      glob: 'app/**/*.{vue,css,scss,ts}'
+      run: node scripts/check-design-tokens.mjs
+
+pre-push:
+  commands:
+    typecheck:
+      run: pnpm typecheck
