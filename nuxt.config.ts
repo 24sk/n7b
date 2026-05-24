@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/hints',
+    '@nuxt/image',
     '@nuxt/ui',
     '@nuxtjs/turnstile',
     '@sentry/nuxt/module',

@@ -54,3 +54,6 @@ Thumbs.db
 # Nitro
 .nitro/
 .vercel
+
+# Nuxt Content (generated SQLite)
+.data/
