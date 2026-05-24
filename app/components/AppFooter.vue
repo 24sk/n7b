@@ -1,6 +1,7 @@
 <script setup lang="ts">
 interface FooterNavItem {
   label: string
+  sublabel: string
   to: string
 }
 
@@ -11,13 +12,13 @@ interface SocialItem {
 }
 
 const footerNav: FooterNavItem[] = [
-  { label: 'About', to: '/about' },
-  { label: 'Works', to: '/works' },
-  { label: 'Journal', to: '/journal' },
-  { label: 'Base Camp', to: '/base-camp' },
-  { label: 'Shop', to: '/shop' },
-  { label: 'Community', to: '/community' },
-  { label: 'Contact', to: '/contact' },
+  { label: 'About', sublabel: '拠点について', to: '/about' },
+  { label: 'Works', sublabel: '制作実績', to: '/works' },
+  { label: 'Journal', sublabel: 'ジャーナル', to: '/journal' },
+  { label: 'Base Camp', sublabel: '有料コンテンツ', to: '/base-camp' },
+  { label: 'Shop', sublabel: '拠点で生まれたもの', to: '/shop' },
+  { label: 'Community', sublabel: 'コミュニティ', to: '/community' },
+  { label: 'Contact', sublabel: 'お問い合わせ', to: '/contact' },
 ]
 
 const socials: SocialItem[] = [
@@ -45,13 +46,18 @@ const currentYear = new Date().getFullYear()
         </NuxtLink>
 
         <nav aria-label="フッターナビゲーション" class="flex-1 lg:px-8">
-          <ul class="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4 lg:flex lg:flex-wrap lg:justify-center lg:gap-x-7 lg:gap-y-3">
+          <ul class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4 lg:flex lg:flex-wrap lg:justify-center lg:gap-x-7 lg:gap-y-4">
             <li v-for="item in footerNav" :key="item.to">
               <NuxtLink
                 :to="item.to"
-                class="font-en text-sm font-medium text-white/90 transition-colors hover:text-accent-yellow"
+                class="group flex flex-col gap-0.5 transition-colors lg:items-center lg:text-center"
               >
-                {{ item.label }}
+                <span class="font-en text-sm font-medium text-white/90 group-hover:text-accent-yellow">
+                  {{ item.label }}
+                </span>
+                <span class="text-[10px] leading-none text-white/60 group-hover:text-accent-yellow">
+                  {{ item.sublabel }}
+                </span>
               </NuxtLink>
             </li>
           </ul>
@@ -72,8 +78,8 @@ const currentYear = new Date().getFullYear()
         </ul>
       </div>
 
-      <div class="mt-12 border-t border-white/10 pt-6 text-center text-caption text-white/70">
-        © {{ currentYear }} Nanako7Base. All Rights Reserved.
+      <div class="mt-10 text-center text-caption text-white/70">
+        © {{ currentYear }} Nango7Base. All Rights Reserved.
       </div>
     </div>
   </footer>

@@ -4,6 +4,7 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',
+    '@nuxt/hints',
     '@nuxt/ui',
   ],
 
@@ -15,6 +16,15 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      ],
+      link: [
+        {
+          rel: 'preload',
+          href: '/fonts/LINESeedJP_OTF_Eb.woff2',
+          as: 'font',
+          type: 'font/woff2',
+          crossorigin: 'anonymous',
+        },
       ],
     },
   },
@@ -43,10 +53,20 @@ export default defineNuxtConfig({
   fonts: {
     families: [
       { name: 'Noto Sans JP', provider: 'google', weights: [400, 500, 700], subsets: ['japanese', 'latin'] },
-      { name: 'Inter', provider: 'google', weights: [400, 500, 700], subsets: ['latin'] },
     ],
     defaults: {
       preload: true,
+    },
+  },
+
+  hints: {
+    devtools: true,
+    features: {
+      hydration: true,
+      lazyLoad: true,
+      webVitals: true,
+      thirdPartyScripts: true,
+      htmlValidate: true,
     },
   },
 })

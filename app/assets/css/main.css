@@ -2,6 +2,20 @@
 @import '@nuxt/ui';
 
 /*
+  app.config.ts 内の compoundVariants で参照する Tailwind ユーティリティを
+  ビルド対象に含める (デフォルトのコンテンツスキャンには含まれない)。
+*/
+@source "../../../app.config.ts";
+
+@font-face {
+  font-family: 'LINE Seed JP';
+  src: url('/fonts/LINESeedJP_OTF_Eb.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
   N7B Design Tokens (デザインガイドライン v1.0 準拠)
   色名の追加・変更時は docs/デザインガイドライン.md と同期すること。
 */
@@ -31,6 +45,13 @@
   --color-error: #d85a4d;
   --color-badge-new: #e85a4f;
 
+  /* Category tags (デザインガイド 5.5 — お知らせのカテゴリ別配色) */
+  --color-category-event-text: #a8801a;
+  --color-category-production-bg: #e8d4f0;
+  --color-category-production-text: #6b3a8a;
+  --color-category-release-bg: #d4e8dc;
+  --color-category-release-text: #2d6b4a;
+
   /* Nuxt UI primary color mapping */
   --ui-color-primary-50: var(--color-teal-50);
   --ui-color-primary-100: var(--color-teal-100);
@@ -41,7 +62,7 @@
 
   /* Font families */
   --font-sans: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic UI', 'Meiryo', sans-serif;
-  --font-en: 'Inter', 'Noto Sans JP', sans-serif;
+  --font-display: 'LINE Seed JP', 'Noto Sans JP', 'Hiragino Sans', sans-serif;
 
   /* Type scale (デザインガイド 3.3) */
   --text-hero: 3rem;
@@ -69,6 +90,16 @@
     color: var(--color-neutral-700);
     background: var(--color-neutral-50);
     font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    font-weight: 800;
   }
 
   *:focus-visible {

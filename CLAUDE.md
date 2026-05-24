@@ -1,6 +1,6 @@
 # N7B プロジェクト規約
 
-南湖7丁目ベース (Nanako7Base / N7B) の Web サイト。Nuxt 4 + TypeScript + Nuxt UI v4。
+南湖7丁目ベース (Nango7Base / N7B) の Web サイト。Nuxt 4 + TypeScript + Nuxt UI v4。
 
 ## 参照ドキュメント (自動読み込み)
 
@@ -8,6 +8,7 @@
 - @docs/技術スタック.md — 採用技術
 - @docs/タスク.md — 実装可能な最小単位のタスクリスト
 - @docs/デザインガイドライン.md — カラー / タイポ / コンポーネント / トーン
+- @docs/フロントエンドコーディングガイドライン.md — レイアウトシフト (CLS) 防止など実装ルール
 
 ## 設定ファイル (自動読み込み)
 
@@ -42,6 +43,23 @@
 2. SFC ブロック順は **`<script>` → `<template>` → `<style>`** (ESLint `vue/block-order` で強制)
 3. Composition API + `<script setup lang="ts">` を標準とする
 4. 内部リンクは `<NuxtLink>`、画像は `<NuxtImg>` / `<NuxtPicture>`、時刻は `<NuxtTime>`
+
+---
+
+## パフォーマンス最適化の選び方
+
+症状別に対処の第一候補を決めておく。`@nuxt/hints` モジュール (Nuxt DevTools 内) が `lazyLoad` / `webVitals` / `hydration` 等で違反を検知するので、警告が出た箇所から以下の表で対処を選ぶ。
+
+| 症状                               | 第一候補                                                            | 補足                                                           |
+| ---------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------- |
+| バンドルが重い (未使用静的 import) | `<LazyComponentName>` または `defineAsyncComponent`                 | `@nuxt/hints` の `lazyLoad` が SSR/初期 hydration 未使用を検知 |
+| Lazy 化で読み込み中の空白が出る    | `<template #fallback>` + `<USkeleton>`                              | Suspense の fallback スロットでレイアウトシフトを防ぐ          |
+| 初期 JS 実行が重い (LCP/INP 悪化)  | `hydrate-on-visible` / `hydrate-on-idle` / `hydrate-on-interaction` | `webVitals` が LCP/INP/CLS を計測。要素別の最適化ヒントを参照  |
+| インタラクション不要 (表示のみ)    | `*.server.vue` (Server Component)                                   | クライアント JS をゼロにする。`<NuxtIsland>` も同義            |
+
+決定の優先順位: **Server Component で済むなら最優先 → 遅延 hydration → Lazy import + Skeleton**。すべて `@nuxt/hints` の警告に従って判断し、推測で先回りしない。
+
+レイアウトシフト (CLS) 防止の具体ルールは @docs/フロントエンドコーディングガイドライン.md を参照。
 
 ---
 

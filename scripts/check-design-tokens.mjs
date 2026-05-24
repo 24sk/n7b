@@ -36,6 +36,11 @@ const ALLOWED_HEX = new Set([
   '#E89F3B',
   '#D85A4D',
   '#E85A4F',
+  '#A8801A',
+  '#E8D4F0',
+  '#6B3A8A',
+  '#D4E8DC',
+  '#2D6B4A',
   '#FFFFFF',
   '#FFF',
 ].map(c => c.toUpperCase()))
