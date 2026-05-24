@@ -1,11 +1,16 @@
+import process from 'node:process'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 
   modules: [
+    '@nuxt/content',
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/hints',
     '@nuxt/ui',
+    '@nuxtjs/turnstile',
+    '@sentry/nuxt/module',
   ],
 
   devtools: { enabled: true },
@@ -30,6 +35,25 @@ export default defineNuxtConfig({
   },
 
   css: ['~/assets/css/main.css'],
+
+  runtimeConfig: {
+    notionApiToken: process.env.NOTION_API_TOKEN ?? '',
+    notionContactDbId: process.env.NOTION_CONTACT_DB_ID ?? '',
+    notionNewsDbId: process.env.NOTION_NEWS_DB_ID ?? '',
+    resendApiKey: process.env.RESEND_API_KEY ?? '',
+    contactNotificationTo: 'contact@nango7base.jp',
+    contactNotificationFrom: 'noreply@nango7base.jp',
+    turnstile: {
+      secretKey: '',
+    },
+    public: {
+      siteUrl: 'https://nango7base.jp',
+      sentryDsn: '',
+      turnstile: {
+        siteKey: '',
+      },
+    },
+  },
 
   future: {
     compatibilityVersion: 4,
@@ -68,5 +92,9 @@ export default defineNuxtConfig({
       thirdPartyScripts: true,
       htmlValidate: true,
     },
+  },
+
+  turnstile: {
+    siteKey: '',
   },
 })

@@ -25,8 +25,10 @@ const subjectOptions = [
   { value: 'other', label: 'その他' },
 ]
 
+const turnstileToken = ref('')
 const isSubmitting = ref(false)
 const submitted = ref(false)
+const submitError = ref<string | null>(null)
 
 function validate(form: ContactForm): FormError[] {
   const errors: FormError[] = []
@@ -48,15 +50,32 @@ function validate(form: ContactForm): FormError[] {
   if (!form.consent)
     errors.push({ name: 'consent', message: 'プライバシーポリシーへの同意が必要です' })
 
+  if (!turnstileToken.value)
+    errors.push({ name: 'turnstile', message: 'スパム対策の検証が完了していません。少し待ってから再度お試しください。' })
+
   return errors
 }
 
 async function onSubmit(_event: FormSubmitEvent<ContactForm>) {
   isSubmitting.value = true
-  /* TODO(1-23): /api/contact に POST して Notion 登録 + Resend 通知 */
-  await new Promise(resolve => setTimeout(resolve, 600))
-  submitted.value = true
-  isSubmitting.value = false
+  submitError.value = null
+  try {
+    await $fetch('/api/contact', {
+      method: 'POST',
+      body: {
+        ...state,
+        turnstileToken: turnstileToken.value,
+      },
+    })
+    submitted.value = true
+  }
+  catch (error: unknown) {
+    submitError.value = '送信に失敗しました。時間をおいて再度お試しください。'
+    console.error('[contact] submit failed', error)
+  }
+  finally {
+    isSubmitting.value = false
+  }
 }
 
 usePageSeo({
@@ -172,12 +191,25 @@ usePageSeo({
             </UCheckbox>
           </UFormField>
 
+          <UFormField name="turnstile">
+            <NuxtTurnstile v-model="turnstileToken" />
+          </UFormField>
+
+          <div
+            v-if="submitError"
+            class="rounded-md border border-error/30 bg-error/5 p-4 text-body text-error"
+            role="alert"
+          >
+            {{ submitError }}
+          </div>
+
           <div class="pt-2">
             <UButton
               type="submit"
               color="primary"
               size="lg"
               :loading="isSubmitting"
+              :disabled="!turnstileToken"
               trailing-icon="i-lucide-send"
               class="rounded-md font-medium"
             >

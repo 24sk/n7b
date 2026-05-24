@@ -1,59 +1,11 @@
 <script setup lang="ts">
-interface NewsItem {
-  id: string
-  date: string
-  category: 'お知らせ' | 'イベント' | '制作' | 'リリース'
-  title: string
-  to: string
-  isNew?: boolean
-}
+import type { NewsListItem } from '~~/shared/types/news'
+import { formatNewsDate, isRecent, newsCategoryClass } from '~/utils/news'
 
-const news: NewsItem[] = [
-  {
-    id: 'n-001',
-    date: '2026.05.20',
-    category: 'お知らせ',
-    title: '南湖7丁目ベースの Web サイトを公開しました',
-    to: '/news/site-launch',
-    isNew: true,
-  },
-  {
-    id: 'n-002',
-    date: '2026.05.15',
-    category: 'イベント',
-    title: 'フィールドワークショップ「砂と灯り」開催のお知らせ',
-    to: '/news/workshop-may',
-    isNew: true,
-  },
-  {
-    id: 'n-003',
-    date: '2026.05.10',
-    category: '制作',
-    title: 'オリジナルランタンの新色を制作中です',
-    to: '/news/lantern-color',
-  },
-  {
-    id: 'n-004',
-    date: '2026.05.05',
-    category: 'リリース',
-    title: 'フィールドノート 第二版をリリースしました',
-    to: '/news/notebook-v2',
-  },
-  {
-    id: 'n-005',
-    date: '2026.05.01',
-    category: 'お知らせ',
-    title: 'Base Camp 有料コンテンツの先行登録を開始します',
-    to: '/news/base-camp-preorder',
-  },
-]
-
-const categoryClass: Record<NewsItem['category'], string> = {
-  お知らせ: 'bg-teal-100 text-teal-700',
-  イベント: 'bg-accent-yellow/20 text-category-event-text',
-  制作: 'bg-category-production-bg text-category-production-text',
-  リリース: 'bg-category-release-bg text-category-release-text',
-}
+const { data: news, pending } = await useFetch<NewsListItem[]>('/api/news', {
+  default: () => [],
+  transform: items => items.slice(0, 5),
+})
 </script>
 
 <template>
@@ -102,20 +54,37 @@ const categoryClass: Record<NewsItem['category'], string> = {
             </NuxtLink>
           </header>
 
-          <ul class="flex-1 divide-y divide-neutral-100">
+          <div v-if="pending && !news.length" class="flex-1 space-y-2">
+            <USkeleton v-for="i in 5" :key="i" class="h-10 w-full rounded" />
+          </div>
+
+          <div
+            v-else-if="!news.length"
+            class="flex-1 rounded-md border border-neutral-300 bg-neutral-50 p-6 text-body text-neutral-700"
+          >
+            まだお知らせはありません。次の更新まで、もう少しお待ちください。
+          </div>
+
+          <ul v-else class="flex-1 divide-y divide-neutral-100">
             <li v-for="item in news" :key="item.id">
               <NuxtLink
-                :to="item.to"
+                :to="`/news/${item.slug}`"
                 class="grid grid-cols-[auto_auto_1fr_auto] items-center gap-3 py-3 transition-colors hover:bg-neutral-50/50"
               >
-                <time class="font-en text-caption text-neutral-500">{{ item.date }}</time>
+                <time class="font-en text-caption text-neutral-500">
+                  {{ formatNewsDate(item.publishedAt) }}
+                </time>
                 <span
-                  class="inline-block rounded px-2 py-0.5 text-[10px] font-medium" :class="[categoryClass[item.category]]"
+                  class="inline-block rounded px-2 py-0.5 text-[10px] font-medium"
+                  :class="[newsCategoryClass[item.category]]"
                 >
                   {{ item.category }}
                 </span>
                 <span class="truncate text-body text-neutral-900">{{ item.title }}</span>
-                <span v-if="item.isNew" class="rounded bg-badge-new px-1.5 py-0.5 text-[10px] font-bold text-white">
+                <span
+                  v-if="isRecent(item.publishedAt)"
+                  class="rounded bg-badge-new px-1.5 py-0.5 text-[10px] font-bold text-white"
+                >
                   NEW
                 </span>
               </NuxtLink>
