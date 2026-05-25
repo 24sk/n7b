@@ -42,6 +42,9 @@ export default defineNuxtConfig({
     notionContactDbId: process.env.NOTION_CONTACT_DB_ID ?? '',
     notionNewsDbId: process.env.NOTION_NEWS_DB_ID ?? '',
     resendApiKey: process.env.RESEND_API_KEY ?? '',
+    resendAudienceId: process.env.RESEND_AUDIENCE_ID ?? '',
+    newsletterTokenSecret: process.env.NEWSLETTER_TOKEN_SECRET ?? '',
+    newsletterFrom: 'noreply@nango7base.jp',
     contactNotificationTo: 'contact@nango7base.jp',
     contactNotificationFrom: 'noreply@nango7base.jp',
     turnstile: {
