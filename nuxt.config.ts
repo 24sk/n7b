@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@nuxtjs/turnstile',
     '@sentry/nuxt/module',
+    'nuxt-studio',
   ],
 
   devtools: { enabled: true },
@@ -36,6 +37,16 @@ export default defineNuxtConfig({
   },
 
   css: ['~/assets/css/main.css'],
+
+  content: {
+    build: {
+      markdown: {
+        remarkPlugins: {
+          'remark-heading-id': {},
+        },
+      },
+    },
+  },
 
   runtimeConfig: {
     notionApiToken: process.env.NOTION_API_TOKEN ?? '',
@@ -99,6 +110,15 @@ export default defineNuxtConfig({
       webVitals: true,
       thirdPartyScripts: true,
       htmlValidate: true,
+    },
+  },
+
+  studio: {
+    repository: {
+      provider: 'github',
+      owner: '24sk',
+      repo: 'n7b',
+      branch: 'main',
     },
   },
 
