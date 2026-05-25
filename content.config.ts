@@ -9,7 +9,7 @@ export default defineContentConfig({
         title: z.string(),
         description: z.string(),
         publishedAt: z.string(),
-        category: z.enum(['制作', 'リサーチ', '雑記', 'お知らせ']).optional(),
+        category: z.enum(['制作', 'リサーチ', '雑記']),
         tags: z.array(z.string()).optional(),
         hero: z.string().optional(),
       }),

@@ -116,3 +116,105 @@
     }
   }
 }
+
+/*
+  Article body (Nuxt Content の ContentRenderer 出力に適用)
+  Markdown から生成される素の HTML 要素にブランドトーンを与える。
+  @tailwindcss/typography を入れる代わりに、必要最小限のスタイルを定義する。
+*/
+.article-body {
+  color: var(--color-neutral-700);
+  font-size: var(--text-body-lg);
+  line-height: var(--text-body-lg--line-height);
+}
+.article-body h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  font-size: var(--text-h2);
+  line-height: var(--text-h2--line-height);
+  color: var(--color-neutral-900);
+}
+.article-body h3 {
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  font-size: var(--text-h3);
+  line-height: var(--text-h3--line-height);
+  color: var(--color-neutral-900);
+}
+.article-body p {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.article-body a {
+  color: var(--color-teal-700);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 200ms;
+}
+.article-body a:hover {
+  color: var(--color-teal-800);
+}
+.article-body strong {
+  font-weight: 700;
+  color: var(--color-neutral-900);
+}
+.article-body ul,
+.article-body ol {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+.article-body ul {
+  list-style: disc;
+}
+.article-body ol {
+  list-style: decimal;
+}
+.article-body li {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+.article-body blockquote {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--color-teal-600);
+  background: var(--color-neutral-50);
+  color: var(--color-neutral-700);
+  font-style: normal;
+}
+.article-body code {
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  background: var(--color-neutral-100);
+  font-size: 0.875em;
+  color: var(--color-neutral-900);
+}
+.article-body pre {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background: var(--color-neutral-900);
+  color: var(--color-neutral-50);
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.article-body pre code {
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+}
+.article-body img {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0.25rem;
+}
+.article-body hr {
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+  border-color: var(--color-neutral-100);
+}
