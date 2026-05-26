@@ -11,6 +11,7 @@ usePageSeo({
     <HomeHero />
     <HomeProducts />
     <HomeCategories />
+    <HomeJournal />
     <HomeContactAndNews />
 
     <section class="bg-white">
