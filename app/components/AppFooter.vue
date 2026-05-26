@@ -27,6 +27,17 @@ const socials: SocialItem[] = [
   { label: 'YouTube', icon: 'i-lucide-youtube', href: '#' },
 ]
 
+interface LegalLink {
+  label: string
+  to: string
+}
+
+const legalLinks: LegalLink[] = [
+  { label: '特定商取引法に基づく表記', to: '/legal/tokushoho' },
+  { label: 'プライバシーポリシー', to: '/legal/privacy' },
+  { label: '利用規約', to: '/legal/terms' },
+]
+
 const currentYear = new Date().getFullYear()
 </script>
 
@@ -78,8 +89,23 @@ const currentYear = new Date().getFullYear()
         </ul>
       </div>
 
-      <div class="mt-10 text-center text-caption text-white/70">
-        © {{ currentYear }} Nango7Base. All Rights Reserved.
+      <div class="mt-10 border-t border-white/10 pt-6">
+        <ul
+          aria-label="法的情報"
+          class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-caption text-white/70"
+        >
+          <li v-for="link in legalLinks" :key="link.to">
+            <NuxtLink
+              :to="link.to"
+              class="transition-colors hover:text-accent-yellow"
+            >
+              {{ link.label }}
+            </NuxtLink>
+          </li>
+        </ul>
+        <p class="mt-4 text-center text-caption text-white/70">
+          © {{ currentYear }} Nango7Base. All Rights Reserved.
+        </p>
       </div>
     </div>
   </footer>

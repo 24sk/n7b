@@ -41,7 +41,7 @@ interface InfoItem {
 
 const info: InfoItem[] = [
   { label: '所在地', value: '神奈川県茅ヶ崎市南湖7丁目（詳細はお問い合わせください）' },
-  { label: '運営', value: 'Tsuyoshi Tsuchida / 南湖7丁目ベース' },
+  { label: '運営', value: '内田 剛 / 南湖7丁目ベース' },
   { label: '活動', value: 'ものづくり / システム開発 / 発信 / ワークショップ' },
   { label: '連絡', value: 'contact@nango7base.jp' },
 ]
