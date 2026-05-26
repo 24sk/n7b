@@ -6,7 +6,7 @@
 
 - @docs/ロードマップ.md — フェーズ計画
 - @docs/技術スタック.md — 採用技術
-- @docs/タスク.md — 実装可能な最小単位のタスクリスト
+- @docs/tasks/tasks.md — 実装可能な最小単位のタスクリスト
 - @docs/デザインガイドライン.md — カラー / タイポ / コンポーネント / トーン
 - @docs/フロントエンドコーディングガイドライン.md — レイアウトシフト (CLS) 防止など実装ルール
 
@@ -25,6 +25,22 @@
 - `scripts/` — 開発補助 (BEM / デザイントークンチェッカー等)
 - `docs/` — 仕様・ガイドライン
 - `.claude/` — Claude Code 設定 (`settings.json` + `hooks/`)
+
+---
+
+## コード設計原則
+
+1. **車輪の再開発はしない** — 既存のライブラリ / フレームワーク / プロジェクト内ユーティリティで実現できることを自作しない。実装前に以下の順で既存実装を確認する
+   - Nuxt UI v4 のコンポーネント / Composables (`useToast` / `useOverlay` 等)
+   - Nuxt / Nitro / Vue の標準機能 (`useFetch` / `useAsyncData` / `useState` / `useRoute` 等)
+   - VueUse (`useStorage` / `useDebounceFn` / `useMouse` 等)
+   - プロジェクト内の `app/composables/` / `app/utils/` / `shared/`
+   - npm エコシステムの定番ライブラリ (Zod / date-fns 等)
+   - これらで満たせない場合のみ自作する
+2. **単一責任の原則 (SRP)** — 1 コンポーネント / 1 composable / 1 関数 / 1 ファイル / 1 API ルートは 1 つの責務だけを持つ
+   - コンポーネントは「表示」と「ロジック」を分離する。ロジックは composable に切り出す
+   - server route は 1 エンドポイント = 1 ユースケース。複数の責務 (例: フォーム受付 + 別 DB への書き込み + メール送信) はサービス関数に分解して呼び出す
+   - 「〜と〜をする関数」になったら分割する。命名で `and` / 「と」が必要になった時点で SRP 違反のサイン
 
 ---
 
@@ -67,7 +83,13 @@
 
 - API ルートは `server/api/*.{get,post,put,delete}.ts`
 - 入力検証は **Zod** で `getValidatedQuery` / `readValidatedBody`
-- 自動化処理は **n8n 等を使わず Nuxt server route 内で直接実装** (@docs/タスク.md 冒頭の方針メモ参照)
+- 自動化処理は **n8n 等を使わず Nuxt server route 内で直接実装** (@docs/tasks/tasks.md 冒頭の方針メモ参照)
+
+---
+
+## タスク管理
+
+`docs/tasks/` 配下のドキュメント (例: @docs/tasks/tasks.md) を編集する作業では、**実装・対応が完了したタスクのチェックボックス (`- [ ]` → `- [x]`) を必ず更新する**。タスク本文の修正・追加だけ行ってチェック状態を放置しない。
 
 ---
 

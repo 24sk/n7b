@@ -51,6 +51,8 @@
   --color-category-production-text: #6b3a8a;
   --color-category-release-bg: #d4e8dc;
   --color-category-release-text: #2d6b4a;
+  --color-category-tech-bg: #dce3ec;
+  --color-category-tech-text: #2d4a6b;
 
   /* Nuxt UI primary color mapping */
   --ui-color-primary-50: var(--color-teal-50);
