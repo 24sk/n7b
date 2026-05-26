@@ -37,9 +37,9 @@
 
 ### A-4. ローカル動作確認
 
-- [ ] **AJ-10** `pnpm dev` で `/journal` に「技術」カテゴリフィルタが表示されることを確認  
+- [x] **AJ-10** `pnpm dev` で `/journal` に「技術」カテゴリフィルタが表示されることを確認  
   依存: AJ-1, AJ-7
-- [ ] **AJ-11** `_drafts/sample.md` を一時的に手動配置し、`queryCollection('journal').all()` の結果に含まれないことを確認  
+- [x] **AJ-11** `_drafts/sample.md` を一時的に手動配置し、`queryCollection('journal').all()` の結果に含まれないことを確認  
   依存: AJ-2, AJ-9
 - [x] **AJ-12** `pnpm check:all` (eslint + BEM + tokens) と `pnpm typecheck` が通ることを確認  
   依存: AJ-6, AJ-7
@@ -54,98 +54,98 @@
 
 ### B-1. 依存関係と環境変数
 
-- [ ] **AJ-14** `package.json` に `fast-xml-parser` を追加 (`pnpm add fast-xml-parser`)
-- [ ] **AJ-15** `package.json` の `scripts` に `"daily-n7b": "tsx src/index.ts daily-n7b"` を追加
-- [ ] **AJ-16** `.env.example` に `N7B_REPO_PATH=/Users/tuchida/dev/n7b` / `SLACK_WEBHOOK_URL=` / `OVERWRITE_EXISTING=false` / `N7B_GIT_BRANCH=main` を追加
-- [ ] **AJ-17** 実 `.env` に `N7B_REPO_PATH` を設定 (Slack Webhook は任意)
+- [x] **AJ-14** `package.json` に `fast-xml-parser` を追加 (※ プロジェクトは npm 構成だったため `npm install fast-xml-parser` で導入)
+- [x] **AJ-15** `package.json` の `scripts` に `"daily-n7b": "tsx src/index.ts daily-n7b"` を追加
+- [x] **AJ-16** `.env.example` に `N7B_REPO_PATH=/Users/tuchida/dev/n7b` / `SLACK_WEBHOOK_URL=` / `OVERWRITE_EXISTING=false` / `N7B_GIT_BRANCH=main` を追加
+- [x] **AJ-17** 実 `.env` に `N7B_REPO_PATH` を設定 (Slack Webhook は任意)
 
 ### B-2. 共通ユーティリティ切り出し (refactor)
 
-- [ ] **AJ-18** 既存 `src/analyze.ts` から `buildConversationSummary` 関数を `src/utils/conversation-summary.ts` に切り出し (8000 字制限は維持)
-- [ ] **AJ-19** `src/analyze.ts` を切り出した関数を import する形に修正し、既存 `npm run dev` (note.com フロー) が壊れていないことを確認  
+- [x] **AJ-18** 既存 `src/analyze.ts` から `buildConversationSummary` 関数を `src/utils/conversation-summary.ts` に切り出し (8000 字制限は維持)
+- [x] **AJ-19** `src/analyze.ts` を切り出した関数を import する形に修正し、既存 `npm run dev` (note.com フロー) が壊れていないことを確認  
   依存: AJ-18
 
 ### B-3. トレンド取得モジュール
 
-- [ ] **AJ-20** `src/extract/trends.ts` を新規作成、`TrendItem` 型と `extractTrends(targetDate: Date)` の骨格を実装
-- [ ] **AJ-21** Hacker News API (`https://hacker-news.firebaseio.com/v0/topstories.json` + `/item/{id}.json`) で score 上位 10 件を取得する処理を実装  
+- [x] **AJ-20** `src/extract/trends.ts` を新規作成、`TrendItem` 型と `extractTrends(targetDate: Date)` の骨格を実装
+- [x] **AJ-21** Hacker News API (`https://hacker-news.firebaseio.com/v0/topstories.json` + `/item/{id}.json`) で score 上位 10 件を取得する処理を実装  
   依存: AJ-20
-- [ ] **AJ-22** Zenn RSS (`https://zenn.dev/feed`) を `fast-xml-parser` でパースし、`Nuxt / Vue / Claude / TypeScript / Vercel` 等のキーワードマッチで上位 5 件を取得  
+- [x] **AJ-22** Zenn RSS (`https://zenn.dev/feed`) を `fast-xml-parser` でパースし、`Nuxt / Vue / Claude / TypeScript / Vercel` 等のキーワードマッチで上位 5 件を取得  
   依存: AJ-14, AJ-20
-- [ ] **AJ-23** 失敗時に throw せず空配列を返し warn ログのみ出力する耐性処理を実装  
+- [x] **AJ-23** 失敗時に throw せず空配列を返し warn ログのみ出力する耐性処理を実装  
   依存: AJ-21, AJ-22
-- [ ] **AJ-24** 単体動作確認 `npx tsx -e "import('./src/extract/trends.ts').then(m => m.extractTrends(new Date()).then(console.log))"`  
+- [x] **AJ-24** 単体動作確認 `npx tsx -e "import('./src/extract/trends.ts').then(m => m.extractTrends(new Date()).then(console.log))"` (12 件取得確認)  
   依存: AJ-23
 
 ### B-4. N7B 用記事生成
 
-- [ ] **AJ-25** `src/analyze-n7b.ts` を新規作成、`N7bArticle` 型 (title/description/slug/category/tags/tier/content/publishedAt) を定義
-- [ ] **AJ-26** Anthropic SDK Client を `claude-opus-4-7` / `max_tokens: 4096` / `maxRetries: 3` で初期化  
+- [x] **AJ-25** `src/analyze-n7b.ts` を新規作成、`N7bArticle` 型 (title/description/slug/category/tags/tier/content/publishedAt) を定義
+- [x] **AJ-26** Anthropic SDK Client を `claude-opus-4-7` / `max_tokens: 4096` / `maxRetries: 3` で初期化  
   依存: AJ-25
-- [ ] **AJ-27** system プロンプト記述: N7B ペルソナ、ですます調、@docs/デザインガイドライン.md §11 ボイス&トーン遵守、AI 表現禁止 (「ぜひ」「効果的に」「活用」「説明します」)、体験ベース  
+- [x] **AJ-27** system プロンプト記述: N7B ペルソナ、ですます調、@docs/デザインガイドライン.md §11 ボイス&トーン遵守、AI 表現禁止 (「ぜひ」「効果的に」「活用」「説明します」)、体験ベース  
   依存: AJ-25
-- [ ] **AJ-28** user プロンプト記述: 会話履歴サマリ + トレンド配列を渡し「今日のログから1つ技術記事として価値あるトピックを選ぶ。トレンドと結びつけてもよい」、PII マスク指示、厳密 JSON 出力指定、H1 含まず・本文 800〜1500 字  
+- [x] **AJ-28** user プロンプト記述: 会話履歴サマリ + トレンド配列を渡し「今日のログから1つ技術記事として価値あるトピックを選ぶ。トレンドと結びつけてもよい」、PII マスク指示、厳密 JSON 出力指定、H1 含まず・本文 800〜1500 字  
   依存: AJ-27
-- [ ] **AJ-29** `{"title": null}` 戻り時のスキップ分岐実装  
+- [x] **AJ-29** `{"title": null}` 戻り時のスキップ分岐実装  
   依存: AJ-25
-- [ ] **AJ-30** slug サニタイズ処理 (英数字とハイフンのみ、kebab-case)  
+- [x] **AJ-30** slug サニタイズ処理 (英数字とハイフンのみ、kebab-case)  
   依存: AJ-25
-- [ ] **AJ-31** `tier` は LLM 出力に含めず、常に `'free'` 固定でセット  
+- [x] **AJ-31** `tier` は LLM 出力に含めず、常に `'free'` 固定でセット  
   依存: AJ-25
 
 ### B-5. N7B 同期モジュール (Git 操作)
 
-- [ ] **AJ-32** `src/sync-to-n7b.ts` を新規作成、`syncToN7b(article: N7bArticle)` 関数の骨格を実装
-- [ ] **AJ-33** ファイルパス決定: `${N7B_REPO_PATH}/content/journal/_drafts/${date}-${slug}.md`  
+- [x] **AJ-32** `src/sync-to-n7b.ts` を新規作成、`syncToN7b(article: N7bArticle)` 関数の骨格を実装
+- [x] **AJ-33** ファイルパス決定: `${N7B_REPO_PATH}/content/journal/_drafts/${date}-${slug}.md`  
   依存: AJ-32
-- [ ] **AJ-34** 冪等性: 既存ファイルあり時に slug へ `-2`, `-3` suffix を自動付与する処理 (`OVERWRITE_EXISTING=true` で上書き許可)  
+- [x] **AJ-34** 冪等性: 既存ファイルあり時に slug へ `-2`, `-3` suffix を自動付与する処理 (`OVERWRITE_EXISTING=true` で上書き許可)  
   依存: AJ-33
-- [ ] **AJ-35** YAML frontmatter 構築 (title/description/publishedAt/category/tags/tier、日本語値はクオート)  
+- [x] **AJ-35** YAML frontmatter 構築 (title/description/publishedAt/category/tags/tier、日本語値はクオート)  
   依存: AJ-32
-- [ ] **AJ-36** 事前チェック: `git status --porcelain` で未コミット変更があれば abort  
+- [x] **AJ-36** 事前チェック: `git status --porcelain` で未コミット変更があれば abort  
   依存: AJ-32
-- [ ] **AJ-37** 事前チェック: 現在ブランチが `main` 以外なら abort  
+- [x] **AJ-37** 事前チェック: 現在ブランチが `main` 以外なら abort  
   依存: AJ-32
-- [ ] **AJ-38** `git pull --rebase origin main` 実行 (失敗時は警告のみで push まで進めない)  
+- [x] **AJ-38** `git pull --rebase origin main` 実行 (失敗時は警告のみで push まで進めない)  
   依存: AJ-36, AJ-37
-- [ ] **AJ-39** `git add ${file}` (ピンポイント add)、`git commit -m "docs(journal): add draft ${date}-${slug}"`、`git push origin main` を `execFile` で実行 (`exec` は使わない)  
+- [x] **AJ-39** `git add ${file}` (ピンポイント add)、`git commit -m "docs(journal): add draft ${date}-${slug}"`、`git push origin main` を `execFile` で実行 (`exec` は使わない)  
   依存: AJ-35, AJ-38
-- [ ] **AJ-40** `--no-verify` は使わず、pre-commit / pre-push hook を通すこと  
+- [x] **AJ-40** `--no-verify` は使わず、pre-commit / pre-push hook を通すこと  
   依存: AJ-39
 
 ### B-6. 通知モジュール
 
-- [ ] **AJ-41** `src/notify.ts` を新規作成、`notify(payload)` の骨格を実装
-- [ ] **AJ-42** macOS 通知: `osascript -e 'display notification "..." with title "N7B"'` を実装  
+- [x] **AJ-41** `src/notify.ts` を新規作成、`notify(payload)` の骨格を実装
+- [x] **AJ-42** macOS 通知: `osascript -e 'display notification "..." with title "N7B"'` を実装  
   依存: AJ-41
-- [ ] **AJ-43** Slack Incoming Webhook 送信処理 (`SLACK_WEBHOOK_URL` 未設定なら skip)  
+- [x] **AJ-43** Slack Incoming Webhook 送信処理 (`SLACK_WEBHOOK_URL` 未設定なら skip)  
   依存: AJ-41
-- [ ] **AJ-44** 成功 / ネタなし / 失敗の 3 パターンメッセージテンプレート  
+- [x] **AJ-44** 成功 / ネタなし / 失敗の 3 パターンメッセージテンプレート  
   依存: AJ-42, AJ-43
 
 ### B-7. オーケストレーター
 
-- [ ] **AJ-45** `src/index.ts` に `daily-n7b` サブコマンドを追加 (既存 `extract` / `analyze` / `dev` は温存)
-- [ ] **AJ-46** ログ抽出 (Claude Code + Cursor) を並列実行、Obsidian `31-note/YYYY/MM/DD/` への保存も維持  
+- [x] **AJ-45** `src/index.ts` に `daily-n7b` サブコマンドを追加 (既存 `extract` / `analyze` / `dev` は温存)
+- [x] **AJ-46** ログ抽出 (Claude Code + Cursor) を並列実行、Obsidian `31-note/YYYY/MM/DD/` への保存も維持  
   依存: AJ-45
-- [ ] **AJ-47** `extractTrends` を並列実行で組み込み  
+- [x] **AJ-47** `extractTrends` を並列実行で組み込み  
   依存: AJ-24, AJ-45
-- [ ] **AJ-48** 会話 0 件の場合は notify して終了する分岐  
+- [x] **AJ-48** 会話 0 件の場合は notify して終了する分岐  
   依存: AJ-44, AJ-45
-- [ ] **AJ-49** `generateN7bArticle` を呼び出し、`null` 戻り時は notify して終了  
+- [x] **AJ-49** `generateN7bArticle` を呼び出し、`null` 戻り時は notify して終了  
   依存: AJ-25〜AJ-31, AJ-48
-- [ ] **AJ-50** `syncToN7b` を呼び出し、結果を notify  
+- [x] **AJ-50** `syncToN7b` を呼び出し、結果を notify  
   依存: AJ-32〜AJ-40, AJ-49
-- [ ] **AJ-51** `--dry-run` フラグを追加 (sync せず JSON を標準出力)  
+- [x] **AJ-51** `--dry-run` フラグを追加 (sync せず JSON を標準出力)  
   依存: AJ-45
-- [ ] **AJ-52** すべてのエラーで `exit 0` を保証 (launchd の暴走再実行防止)  
+- [x] **AJ-52** すべてのエラーで `exit 0` を保証 (launchd の暴走再実行防止)  
   依存: AJ-50
 
 ### B-8. 手動 E2E 動作確認
 
-- [ ] **AJ-53** `pnpm daily-n7b -- --dry-run 2026-05-25` で JSON 出力が正しいか確認  
+- [x] **AJ-53** `npm run daily-n7b -- --dry-run 2026-05-26` で JSON 出力確認 — 全フィールド適切、AI 禁止語なし、ですます/体験ベース/H1なし/N7B 一人称遵守、slug が kebab-case でサニタイズ済み (※ 当初 `{"title": null}` の判定が ```json フェンスなしのレスポンスで失敗していたため `extractJsonPayload` で複数形式に対応する修正を追加)  
   依存: AJ-51
-- [ ] **AJ-54** `pnpm daily-n7b 2026-05-25` で `content/journal/_drafts/2026-05-25-{slug}.md` 生成と自動 commit/push を確認  
+- [ ] **AJ-54** `npm run daily-n7b 2026-05-26` で `content/journal/_drafts/2026-05-26-{slug}.md` 生成と自動 commit/push を確認  
   依存: AJ-52
 - [ ] **AJ-55** 同日 2 回実行で `-2` suffix が付与されることを確認  
   依存: AJ-34, AJ-54
@@ -158,27 +158,27 @@
 
 ### C-1. launchd 設定
 
-- [ ] **AJ-57** `which node` の絶対パスを確認し、ProgramArguments に反映する準備
-- [ ] **AJ-58** `~/Library/LaunchAgents/jp.nango7base.daily-journal.plist` を作成 (StartCalendarInterval 19:00 / EnvironmentVariables / StandardOut/ErrPath / WorkingDirectory)  
+- [x] **AJ-57** `which node` で `/Users/tuchida/.nodenv/versions/24.12.0/bin/node` を確認、plist の ProgramArguments に反映
+- [x] **AJ-58** plist を `scripts/daily-note-post/launchd/jp.nango7base.daily-journal.plist` として作成 (※ 仕様の `~/Library/LaunchAgents/` 直置きではなく、プロジェクト配下に置いて install.sh で配置する方式に変更 — バージョン管理しやすい)  
   依存: AJ-57
-- [ ] **AJ-59** `~/Library/Logs/daily-journal/` ディレクトリを `mkdir -p` で作成  
+- [x] **AJ-59** `~/Library/Logs/daily-journal/` ディレクトリを作成  
   依存: AJ-58
-- [ ] **AJ-60** インストールヘルパー `scripts/daily-note-post/launchd/install.sh` を作成 (bootstrap / bootout / kickstart のワンライナー化)  
+- [x] **AJ-60** インストールヘルパー `scripts/daily-note-post/launchd/install.sh` を作成 (install / uninstall / reinstall / kickstart / status サブコマンド対応、bootstrap / bootout / kickstart のワンライナー化)  
   依存: AJ-58
 
-### C-2. スリープ対応
+### C-2. スリープ対応 (要手動: sudo)
 
 - [ ] **AJ-61** `sudo pmset repeat wakeorpoweron MTWRFSU 18:58:00` で毎日 18:58 自動 wake を設定
 - [ ] **AJ-62** `pmset -g sched` で wake schedule を確認  
   依存: AJ-61
 
-### C-3. 登録と動作確認
+### C-3. 登録と動作確認 (要手動: launchctl)
 
-- [ ] **AJ-63** `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/jp.nango7base.daily-journal.plist` で登録  
+- [ ] **AJ-63** `./scripts/daily-note-post/launchd/install.sh install` で登録 (内部で plist コピー + `launchctl bootstrap gui/$(id -u)`)  
   依存: AJ-58
-- [ ] **AJ-64** `launchctl kickstart -k gui/$(id -u)/jp.nango7base.daily-journal` で即時実行し、ログ出力を確認  
+- [ ] **AJ-64** `./scripts/daily-note-post/launchd/install.sh kickstart` で即時実行し、`~/Library/Logs/daily-journal/stdout.log` 出力を確認  
   依存: AJ-63
-- [ ] **AJ-65** plist を一時的に近い時刻 (例: 17:00) に書き換えて bootstrap し直し、自動発火することを確認 → 19:00 に戻す  
+- [ ] **AJ-65** plist を一時的に近い時刻 (例: 現在時刻+5 分) に書き換えて `install.sh reinstall` し、自動発火を確認 → 19:00 に戻す  
   依存: AJ-63
 - [ ] **AJ-66** Mac を 18:55 に sleep させて 18:58 wake → 19:00 ジョブ実行を翌日ログで確認  
   依存: AJ-61, AJ-65
