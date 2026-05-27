@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useCartStore } from '~/stores/cart'
+
 interface NavItem {
   label: string
   sublabel: string
@@ -20,6 +22,9 @@ const isMenuOpen = ref(false)
 function closeMenu() {
   isMenuOpen.value = false
 }
+
+const cart = useCartStore()
+const cartBadge = computed(() => (cart.itemCount > 99 ? '99+' : String(cart.itemCount)))
 </script>
 
 <template>
@@ -73,13 +78,20 @@ function closeMenu() {
           aria-label="アカウント"
           class="hidden lg:inline-flex"
         />
-        <UButton
-          variant="ghost"
-          color="neutral"
-          icon="i-lucide-shopping-bag"
-          size="md"
-          aria-label="カート"
-        />
+        <NuxtLink
+          to="/cart"
+          class="relative inline-flex size-10 items-center justify-center rounded-md text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-teal-700"
+          :aria-label="cart.itemCount > 0 ? `カート (${cart.itemCount}点)` : 'カート'"
+        >
+          <UIcon name="i-lucide-shopping-bag" class="size-5" />
+          <span
+            v-if="cart.itemCount > 0"
+            class="absolute -top-0.5 -right-0.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-teal-700 px-1 text-[10px] leading-none font-bold text-white"
+            aria-hidden="true"
+          >
+            {{ cartBadge }}
+          </span>
+        </NuxtLink>
         <UButton
           variant="ghost"
           color="neutral"

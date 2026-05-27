@@ -26,8 +26,10 @@ export const ProductSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
   priceJpy: z.number().int().positive(),
-  category: z.enum(['tableware', 'lighting', 'stationery', 'apparel', 'other']),
+  category: z.enum(['tableware', 'lighting', 'stationery', 'apparel', 'craft', 'other']),
   storySlug: z.string().optional(),
+  /** ヤマト宅急便規格 (送料計算に使用) */
+  shippingSize: z.union([z.literal(60), z.literal(80), z.literal(100), z.literal(120), z.literal(140), z.literal(160)]),
 })
 export type ProductConfig = z.infer<typeof ProductSchema>
 
@@ -99,6 +101,7 @@ async function upsertProduct(p: ProductConfig): Promise<void> {
   const metadata: Record<string, string> = {
     slug: p.slug,
     category: p.category,
+    shipping_size: String(p.shippingSize),
   }
   if (p.storySlug)
     metadata.story_slug = p.storySlug

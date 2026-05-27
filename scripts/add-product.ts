@@ -99,6 +99,25 @@ async function askPrice(recommended: number, min: number, max: number): Promise<
   }
 }
 
+const SHIPPING_SIZE_VALUES: readonly ShippingSize[] = [60, 80, 100, 120, 140, 160] as const
+async function askShippingSize(defaultSize: ShippingSize = 60): Promise<ShippingSize> {
+  if (AUTO_YES) {
+    process.stdout.write(`配送サイズ (60/80/100/120/140/160) [${defaultSize}]: ${defaultSize} (auto)\n`)
+    return defaultSize
+  }
+  while (true) {
+    const ans = (await rl.question(
+      `配送サイズ (ヤマト宅急便規格: 60/80/100/120/140/160) [${defaultSize}]: `,
+    )).trim()
+    if (ans === '')
+      return defaultSize
+    const n = Number.parseInt(ans, 10) as ShippingSize
+    if (SHIPPING_SIZE_VALUES.includes(n))
+      return n
+    console.log('  ✖ 60/80/100/120/140/160 のいずれかで入力してください')
+  }
+}
+
 function listExistingSlugs(): string[] {
   if (!existsSync(PRODUCTS_JSON_DIR))
     return []
@@ -182,6 +201,7 @@ console.log(`price       : ¥${priceResult.recommended.toLocaleString()} (推奨
 console.log('────────────────────\n')
 
 const priceJpy = overridePrice ?? await askPrice(priceResult.recommended, priceResult.min, priceResult.max)
+const shippingSize = await askShippingSize()
 const ok = await confirm('この内容で登録しますか? [Y/n]: ', true)
 if (!ok) {
   console.log('キャンセルしました (画像は inbox に残っています)')
@@ -196,6 +216,7 @@ const product: ProductMetadata = {
   description: descResult.description,
   category,
   priceJpy,
+  shippingSize,
 }
 
 commitToAssetsRaw(prepared, PRODUCTS_SRC_DIR, product.slug, inboxDir)

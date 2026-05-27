@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Product } from '~~/shared/types/product'
 import { PRODUCT_CATEGORY_LABEL } from '~~/shared/types/product'
+import { useCartStore } from '~/stores/cart'
 
 const route = useRoute()
 const slug = computed(() => String(route.params.slug))
@@ -12,7 +13,27 @@ if (!product.value) {
 }
 
 const activeImageIndex = ref(0)
+const quantity = ref(1)
 const jpy = new Intl.NumberFormat('ja-JP')
+
+const cart = useCartStore()
+const toast = useToast()
+
+function addToCart() {
+  if (!product.value)
+    return
+  cart.addItem(product.value, quantity.value)
+  toast.add({
+    title: 'カートに追加しました',
+    description: `${product.value.name} × ${quantity.value}`,
+    icon: 'i-lucide-check-circle-2',
+    color: 'primary',
+    actions: [
+      { label: 'カートを見る', to: '/cart', color: 'primary', variant: 'outline' },
+    ],
+  })
+  quantity.value = 1
+}
 
 usePageSeo({
   title: product.value.name,
@@ -92,20 +113,49 @@ usePageSeo({
             </p>
 
             <div class="mt-8 space-y-3">
+              <div class="flex items-center gap-3">
+                <label class="text-caption font-medium text-neutral-700" :for="`qty-${product.slug}`">
+                  数量
+                </label>
+                <div class="inline-flex items-center rounded-md border border-neutral-300">
+                  <button
+                    type="button"
+                    class="flex size-9 items-center justify-center text-neutral-700 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    :disabled="quantity <= 1"
+                    aria-label="数量を1減らす"
+                    @click="quantity = Math.max(1, quantity - 1)"
+                  >
+                    <UIcon name="i-lucide-minus" class="size-4" />
+                  </button>
+                  <input
+                    :id="`qty-${product.slug}`"
+                    v-model.number="quantity"
+                    type="number"
+                    min="1"
+                    inputmode="numeric"
+                    class="w-14 border-x border-neutral-300 bg-white py-1.5 text-center text-body text-neutral-900 focus:outline-none focus:ring-2 focus:ring-teal-100"
+                    aria-label="数量"
+                  >
+                  <button
+                    type="button"
+                    class="flex size-9 items-center justify-center text-neutral-700 transition-colors hover:bg-neutral-100"
+                    aria-label="数量を1増やす"
+                    @click="quantity = quantity + 1"
+                  >
+                    <UIcon name="i-lucide-plus" class="size-4" />
+                  </button>
+                </div>
+              </div>
               <UButton
                 color="primary"
                 size="lg"
                 block
                 icon="i-lucide-shopping-bag"
-                disabled
+                :disabled="quantity < 1"
+                @click="addToCart"
               >
-                カートに入れる (準備中)
+                カートに入れる
               </UButton>
-              <p class="text-caption text-neutral-500">
-                カート機能は現在準備中です。購入をご希望の方は<NuxtLink to="/contact" class="text-teal-700 hover:text-teal-800">
-                  お問い合わせ
-                </NuxtLink>よりご連絡ください。
-              </p>
             </div>
 
             <NuxtLink

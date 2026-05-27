@@ -1,12 +1,20 @@
 import type Stripe from 'stripe'
-import type { Product, ProductCategory } from '~~/shared/types/product'
-import { PRODUCT_CATEGORIES } from '~~/shared/types/product'
+import type { Product, ProductCategory, ShippingSize } from '~~/shared/types/product'
+import { PRODUCT_CATEGORIES, SHIPPING_SIZES } from '~~/shared/types/product'
 import { useStripe } from './stripe'
 
 function normalizeCategory(value: string | undefined): ProductCategory {
   if (value && (PRODUCT_CATEGORIES as readonly string[]).includes(value))
     return value as ProductCategory
   return 'other'
+}
+
+function normalizeShippingSize(value: string | undefined): ShippingSize {
+  const n = value ? Number.parseInt(value, 10) : Number.NaN
+  if ((SHIPPING_SIZES as readonly number[]).includes(n))
+    return n as ShippingSize
+  // Stripe metadata 未設定 / 不正値時は最小サイズで安全側に倒す (送料は最小)
+  return 60
 }
 
 function mapStripeProduct(p: Stripe.Product): Product | null {
@@ -27,6 +35,7 @@ function mapStripeProduct(p: Stripe.Product): Product | null {
     priceJpy: price.unit_amount,
     taxIncluded: price.tax_behavior === 'inclusive',
     priceId: price.id,
+    shippingSize: normalizeShippingSize(p.metadata.shipping_size),
   }
 }
 

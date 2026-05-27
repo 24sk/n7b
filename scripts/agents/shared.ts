@@ -12,7 +12,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 import { z } from 'zod'
 
-export const CATEGORIES = ['tableware', 'lighting', 'stationery', 'apparel', 'other'] as const
+export const CATEGORIES = ['tableware', 'lighting', 'stationery', 'apparel', 'craft', 'other'] as const
 export type Category = (typeof CATEGORIES)[number]
 
 export const CategorySchema = z.enum(CATEGORIES)
@@ -22,6 +22,7 @@ export const CATEGORY_GUIDE = `カテゴリ定義:
 - lighting: ランタン・キャンドル・照明
 - stationery: ノート・ペン・ステッカーなど文具
 - apparel: Tシャツ・帽子など衣服
+- craft: あみぐるみ・刺繍・木工小物などの手仕事クラフト
 - other: 上記に当てはまらないもの`
 
 export const BRAND_VOICE = `N7B (南湖7丁目ベース) は茅ヶ崎・南湖の海辺に位置する「ものづくり・記録・発信」の拠点です。
@@ -97,12 +98,16 @@ export const PriceSuggestionSchema = z.object({
 })
 export type PriceSuggestion = z.infer<typeof PriceSuggestionSchema>
 
+export type ShippingSize = 60 | 80 | 100 | 120 | 140 | 160
+
 export interface ProductMetadata {
   slug: string
   name: string
   description: string
   category: Category
   priceJpy: number
+  /** ヤマト宅急便規格 (送料計算に使用) */
+  shippingSize: ShippingSize
 }
 
 export function tryParseToolInput<T>(

@@ -142,37 +142,39 @@
 
 ### Week 2: カート機能
 
-- [ ] **2-8** Pinia 導入とカートストア設計（または `useState` + localStorage）  
+- [x] **2-8** Pinia 導入とカートストア設計（`@pinia/nuxt` + `app/stores/cart.ts`、localStorage 永続化は `app/plugins/cart.client.ts` で `$subscribe` ベース）  
   依存: 0-13
-- [ ] **2-9** カート追加・数量変更・削除アクション実装  
+- [x] **2-9** カート追加・数量変更・削除アクション実装（`addItem` / `updateQuantity` / `removeItem` / `clear`）  
   依存: 2-8
-- [ ] **2-10** カート合計金額計算ロジック（小計、税、合計）  
+- [x] **2-10** カート合計金額計算ロジック（getter `subtotal` + `calcInclusiveTax` で内税方式の内訳算出。配送料は Checkout 連携時に Stripe Tax/配送料設定で算出する想定）  
   依存: 2-9
-- [ ] **2-11** Header のカートアイコンにバッジ表示（カート内アイテム数）  
+- [x] **2-11** Header のカートアイコンにバッジ表示（カート内アイテム数、99+ で丸める）  
   依存: 1-6, 2-9
-- [ ] **2-12** カートページ実装  
+- [x] **2-12** カートページ実装 (`app/pages/cart.vue`、空状態 / 数量ステッパ / 内訳サマリ含む)  
   依存: 2-9, 2-10
-- [ ] **2-13** 商品詳細ページの「カートに入れる」ボタンと接続  
+- [x] **2-13** 商品詳細ページの「カートに入れる」ボタンと接続（数量ステッパ + `useToast` で「カートを見る」アクション付き通知）  
   依存: 2-6, 2-9
 
 ### Week 3: Checkout 統合
 
-- [ ] **2-14** `server/api/checkout.post.ts` 実装（Stripe Checkout Session 作成）  
+- [x] **2-14** `server/api/checkout.post.ts` 実装（Stripe Checkout Session 作成。slug+quantity をサーバで再検証 → 内税 / Konbini / 動的 `shipping_options`）  
   依存: 2-3, 2-12
-- [ ] **2-15** カートからのリダイレクト型決済導線実装  
+- [x] **2-15** カートからのリダイレクト型決済導線実装（`app/pages/cart.vue` の「レジに進む」を `/api/checkout` → `navigateTo(external)` に接続）  
   依存: 2-14
-- [ ] **2-16** Checkout 成功ページ (`/checkout/success`) 実装  
+- [x] **2-16** Checkout 成功ページ (`/checkout/success`) 実装（`session_id` から `/api/checkout/session` で要約取得し、`paid` 時にカートを `clear()`）  
   依存: 2-14
-- [ ] **2-17** Checkout キャンセルページ (`/checkout/cancel`) 実装  
+- [x] **2-17** Checkout キャンセルページ (`/checkout/cancel`) 実装（カート保持で戻れる導線）  
   依存: 2-14
-- [ ] **2-18** 配送先住所収集設定（Stripe Checkout の `shipping_address_collection`）  
+- [x] **2-18** 配送先住所収集設定（`shipping_address_collection.allowed_countries: ['JP']` + `phone_number_collection`）  
   依存: 2-14
-- [ ] **2-19** コンビニ決済（Konbini）対応設定  
+- [x] **2-19** コンビニ決済（Konbini）対応設定（`payment_method_types: ['card', 'konbini']` + 期限 3 営業日）  
   依存: 2-14
-- [ ] **2-20** 消費税対応（Stripe Tax 設定または内税方式の価格表示）  
+- [x] **2-20** 消費税対応（Stripe Price を `tax_behavior: 'inclusive'` で登録済みのため内税方式で統一。Stripe Tax は不使用）  
   依存: 2-1, 2-14
-- [ ] **2-21** `server/api/webhooks/stripe.post.ts` 実装（署名検証 + イベントタイプ別ハンドラのディスパッチ基盤）  
+- [x] **2-21** `server/api/webhooks/stripe.post.ts` 実装（`readRawBody` + `constructEvent` で署名検証、`checkout.session.completed` / `async_payment_*` / `charge.refunded` の dispatch 基盤のみ。具体処理は Week 4）  
   依存: 2-14
+
+> **送料設計**: 商品マスタに `shippingSize` (ヤマト宅急便規格 60/80/100/120/140/160) を追加。`server/utils/shipping.ts` でカート最大サイズ × 「本州・四国・九州 / 北海道・沖縄」の 2 地域から `shipping_options` を動的生成し、顧客に Checkout 画面で選択させる。料金テーブルは仮値のため、本番切り替え (2-31) 前に確定価格へ更新する。
 
 ### Week 4: 注文管理と運用整備
 

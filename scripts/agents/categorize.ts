@@ -1,7 +1,7 @@
 /*
   Agent 3: カテゴリ分類エージェント
 
-  画像からカテゴリ (tableware/lighting/stationery/apparel/other) と判定理由を生成。
+  画像からカテゴリ (tableware/lighting/stationery/apparel/craft/other) と判定理由を生成。
 */
 import type { Buffer } from 'node:buffer'
 import type { CategorizeOutput } from './shared'
