@@ -47,13 +47,13 @@
 
 ### 法的ページ（Stripe 本番稼働の前提）
 
-- [ ] **0-19** 特定商取引法に基づく表記ページ作成（Vue ページ `app/pages/legal/tokushoho.vue`）  
+- [x] **0-19** 特定商取引法に基づく表記ページ作成（Vue ページ `app/pages/legal/tokushoho.vue`）  
   依存: 0-13
-- [ ] **0-20** プライバシーポリシーページ作成（Vue ページ `app/pages/legal/privacy.vue`）  
+- [x] **0-20** プライバシーポリシーページ作成（Vue ページ `app/pages/legal/privacy.vue`）  
   依存: 0-13
-- [ ] **0-21** 利用規約ページ作成（Vue ページ `app/pages/legal/terms.vue`）  
+- [x] **0-21** 利用規約ページ作成（Vue ページ `app/pages/legal/terms.vue`）  
   依存: 0-13
-- [ ] **0-22** Stripe ダッシュボードに 3 ページの URL を登録し、本番稼働手続きを完了  
+- [x] **0-22** Stripe ダッシュボードに 3 ページの URL を登録し、本番稼働手続きを完了  
   依存: 0-5, 0-19, 0-20, 0-21
 
 ---
@@ -125,19 +125,19 @@
 
 ### Week 1: Stripe 商品設計と一覧ページ
 
-- [ ] **2-1** Stripe Dashboard で商品マスタ登録（マグカップ、ランタン、ノート、ステッカー、Tシャツ）  
+- [x] **2-1** Stripe Dashboard で商品マスタ登録（`pnpm product:add` + `pnpm stripe:seed` の登録フロー整備済み。現状 `crochet-bear-nanako` 1 商品が test モードに登録済。残りは画像準備でき次第追加）  
   依存: 0-5
-- [ ] **2-2** Stripe 商品メタデータの設計（カテゴリ、制作ストーリー slug など）  
+- [x] **2-2** Stripe 商品メタデータの設計（`metadata.slug` / `metadata.category` / `metadata.story_slug` + Price.lookup_key=slug。`scripts/products/*.json` の Zod スキーマで強制）  
   依存: 2-1
-- [ ] **2-3** Stripe SDK を Nuxt サーバに導入（環境変数で APIキー管理）  
+- [x] **2-3** Stripe SDK を Nuxt サーバに導入（`server/utils/stripe.ts` + `runtimeConfig.stripeSecretKey`）  
   依存: 0-16, 2-1
-- [ ] **2-4** `server/api/products.get.ts` 実装（Stripe Products / Prices 取得、ISR 10 分キャッシュ）  
+- [x] **2-4** `server/api/products.get.ts` 実装（Stripe Products / Prices 取得、`defineCachedFunction` で 10 分キャッシュ + `/api/products/[slug]` も同キャッシュを共有）  
   依存: 2-3
-- [ ] **2-5** 商品一覧ページ実装（カテゴリフィルタ含む）  
+- [x] **2-5** 商品一覧ページ `/shop` 実装（カテゴリフィルタ含む、`?category=` でディープリンク可）  
   依存: 2-4
-- [ ] **2-6** 商品詳細ページ実装（画像、説明、価格、カート追加ボタン）  
+- [x] **2-6** 商品詳細ページ `/shop/[slug]` 実装（画像ギャラリー、説明、価格、カート追加ボタン UI / Week 2 で機能化）  
   依存: 2-4
-- [ ] **2-7** トップページの「拠点で生まれたもの」を Stripe 連携に差し替え  
+- [x] **2-7** トップページの「拠点で生まれたもの」を Stripe 連携に差し替え（`HomeProducts.vue` を `/api/products` 経由に改修）  
   依存: 1-10, 2-4
 
 ### Week 2: カート機能

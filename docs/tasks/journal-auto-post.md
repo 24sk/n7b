@@ -145,11 +145,11 @@
 
 - [x] **AJ-53** `npm run daily-n7b -- --dry-run 2026-05-26` で JSON 出力確認 — 全フィールド適切、AI 禁止語なし、ですます/体験ベース/H1なし/N7B 一人称遵守、slug が kebab-case でサニタイズ済み (※ 当初 `{"title": null}` の判定が ```json フェンスなしのレスポンスで失敗していたため `extractJsonPayload` で複数形式に対応する修正を追加)  
   依存: AJ-51
-- [ ] **AJ-54** `npm run daily-n7b 2026-05-26` で `content/journal/_drafts/2026-05-26-{slug}.md` 生成と自動 commit/push を確認  
+- [x] **AJ-54** launchd kickstart 経由で `2026-05-26-claude-code-scheduled-task-aws-cost-report.md` 生成 + commit (`77e9cd3`) + push を確認 (※ 初回は HTTPS+osxkeychain 認証で別アカウント `uchida-stack` が選ばれて 403 失敗 → `origin` を SSH (`git@github.com:24sk/n7b.git`) に切替えて成功)  
   依存: AJ-52
-- [ ] **AJ-55** 同日 2 回実行で `-2` suffix が付与されることを確認  
+- [ ] **AJ-55** 同日 2 回実行で `-2` suffix が付与されることを確認 (要 kickstart 再実行)  
   依存: AJ-34, AJ-54
-- [ ] **AJ-56** Slack / macOS 通知が届くことを確認  
+- [x] **AJ-56** macOS 通知到達確認 (※ osascript は Script Editor の通知許可がデフォルト無効で sink するため、`brew install terminal-notifier` で導入し `notify.ts` を terminal-notifier ベース (osascript フォールバック付き) に変更。terminal-notifier の通知テストで通知到達確認済み。Slack Webhook は未設定のため skip)  
   依存: AJ-44, AJ-54
 
 ---

@@ -54,6 +54,7 @@ export default defineNuxtConfig({
     notionNewsDbId: process.env.NOTION_NEWS_DB_ID ?? '',
     resendApiKey: process.env.RESEND_API_KEY ?? '',
     resendAudienceId: process.env.RESEND_AUDIENCE_ID ?? '',
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? '',
     newsletterTokenSecret: process.env.NEWSLETTER_TOKEN_SECRET ?? '',
     newsletterFrom: 'noreply@nango7base.jp',
     contactNotificationTo: 'contact@nango7base.jp',

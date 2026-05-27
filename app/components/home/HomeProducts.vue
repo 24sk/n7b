@@ -1,64 +1,12 @@
 <script setup lang="ts">
-interface Product {
-  id: string
-  name: string
-  description: string
-  price: number
-  storyHref: string
-  shopHref: string
-  /** 画像差し替えまでの色味プレースホルダー */
-  bg: string
-}
+import type { Product } from '~~/shared/types/product'
 
-const products: Product[] = [
-  {
-    id: 'mug',
-    name: 'N7B モーニングマグ',
-    description: '海辺の時間をイメージした、低めの太めシルエットのマグ。',
-    price: 2200,
-    storyHref: '/stories/mug',
-    shopHref: '/shop/mug',
-    bg: 'from-teal-100 via-teal-50 to-white',
-  },
-  {
-    id: 'lantern',
-    name: 'オリジナルランタン',
-    description: 'フィールドの灯りとしてデザインしたランタン。',
-    price: 6980,
-    storyHref: '/stories/lantern',
-    shopHref: '/shop/lantern',
-    bg: 'from-accent-yellow/20 via-neutral-100 to-white',
-  },
-  {
-    id: 'notebook',
-    name: 'フィールドノート',
-    description: '研究と記録を残すためのオリジナルノート。',
-    price: 1650,
-    storyHref: '/stories/notebook',
-    shopHref: '/shop/notebook',
-    bg: 'from-neutral-100 via-neutral-50 to-white',
-  },
-  {
-    id: 'sticker',
-    name: 'ステッカーセット',
-    description: 'N7B のロゴと記号をあしらった4枚セット。',
-    price: 880,
-    storyHref: '/stories/sticker',
-    shopHref: '/shop/sticker',
-    bg: 'from-teal-50 via-white to-accent-yellow/10',
-  },
-  {
-    id: 'tshirt',
-    name: 'N7B キャンプリングシャツ',
-    description: 'フィールドで快適に着られるグラフィックシャツ。',
-    price: 3850,
-    storyHref: '/stories/tshirt',
-    shopHref: '/shop/tshirt',
-    bg: 'from-neutral-100 via-teal-50 to-white',
-  },
-]
+const { data: products, pending, error } = await useFetch<Product[]>('/api/products', {
+  default: () => [],
+})
 
-const jpy = new Intl.NumberFormat('ja-JP')
+// トップページでは最大5件まで表示
+const visibleProducts = computed(() => products.value.slice(0, 5))
 </script>
 
 <template>
@@ -75,78 +23,35 @@ const jpy = new Intl.NumberFormat('ja-JP')
             フィールドの体感や手ざわりを、カタチにしています。
           </p>
         </div>
-        <div class="flex items-center gap-3">
-          <NuxtLink
-            to="/shop"
-            class="inline-flex items-center gap-1 text-caption font-medium text-teal-700 transition-colors hover:text-teal-800"
-          >
-            すべてのプロダクトを見る
-            <UIcon name="i-lucide-chevron-right" class="size-3.5" />
-          </NuxtLink>
-          <div class="hidden gap-2 lg:flex">
-            <UButton
-              variant="outline"
-              color="neutral"
-              icon="i-lucide-chevron-left"
-              size="sm"
-              aria-label="前のプロダクト"
-            />
-            <UButton
-              variant="outline"
-              color="neutral"
-              icon="i-lucide-chevron-right"
-              size="sm"
-              aria-label="次のプロダクト"
-            />
-          </div>
-        </div>
+        <NuxtLink
+          to="/shop"
+          class="inline-flex items-center gap-1 text-caption font-medium text-teal-700 transition-colors hover:text-teal-800"
+        >
+          すべてのプロダクトを見る
+          <UIcon name="i-lucide-chevron-right" class="size-3.5" />
+        </NuxtLink>
       </header>
 
-      <ul class="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-5">
-        <li v-for="product in products" :key="product.id" class="group flex h-full flex-col">
-          <NuxtLink :to="product.shopHref" class="block">
-            <div
-              class="aspect-square overflow-hidden rounded-lg bg-gradient-to-br" :class="[product.bg]"
-            >
-              <div class="flex h-full w-full items-center justify-center text-teal-700/40 transition-transform duration-300 group-hover:scale-105">
-                <UIcon name="i-lucide-image" class="size-12" />
-              </div>
-            </div>
-          </NuxtLink>
+      <div v-if="pending && !products.length" class="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-5">
+        <div v-for="i in 5" :key="i" class="flex flex-col">
+          <USkeleton class="aspect-square w-full rounded-lg" />
+          <USkeleton class="mt-4 h-4 w-3/4 rounded" />
+          <USkeleton class="mt-2 h-3 w-full rounded" />
+          <USkeleton class="mt-3 h-5 w-1/3 rounded" />
+        </div>
+      </div>
 
-          <div class="mt-4 flex flex-1 flex-col space-y-2">
-            <h3 class="text-body font-bold text-neutral-900">
-              <NuxtLink :to="product.shopHref" class="transition-colors hover:text-teal-700">
-                {{ product.name }}
-              </NuxtLink>
-            </h3>
-            <p class="text-caption leading-relaxed text-neutral-700">
-              {{ product.description }}
-            </p>
-            <p class="mt-auto pt-2 text-h3 font-bold text-neutral-900">
-              ¥{{ jpy.format(product.price) }}
-              <span class="text-caption font-normal text-neutral-500">(税込)</span>
-            </p>
-          </div>
+      <div v-else-if="error" class="mt-10 rounded-md border border-error/30 bg-error/5 p-6 text-body text-error">
+        プロダクトの取得に失敗しました。時間をおいて再度お試しください。
+      </div>
 
-          <div class="mt-3 space-y-2">
-            <NuxtLink
-              :to="product.storyHref"
-              class="inline-flex items-center gap-1 text-caption font-medium text-teal-700 transition-colors hover:text-teal-800"
-            >
-              制作ストーリー
-              <UIcon name="i-lucide-arrow-right" class="size-3" />
-            </NuxtLink>
-            <UButton
-              variant="outline"
-              color="primary"
-              size="sm"
-              block
-              icon="i-lucide-shopping-bag"
-            >
-              カートに入れる
-            </UButton>
-          </div>
+      <div v-else-if="!visibleProducts.length" class="mt-10 rounded-md border border-neutral-300 bg-neutral-50 p-6 text-body text-neutral-700">
+        まだプロダクトがありません。準備中ですので、もう少しお待ちください。
+      </div>
+
+      <ul v-else class="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-5">
+        <li v-for="product in visibleProducts" :key="product.id">
+          <ShopProductCard :product="product" />
         </li>
       </ul>
     </div>

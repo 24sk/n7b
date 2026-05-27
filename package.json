@@ -41,6 +41,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^3.0.0",
     "@anthropic-ai/sdk": "^0.98.0",
+    "@iconify-json/lucide": "^1.2.109",
     "@nuxt/eslint": "^1.0.0",
     "@nuxt/hints": "^1.1.2",
     "better-sqlite3": "^12.10.0",
