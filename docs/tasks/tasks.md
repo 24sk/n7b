@@ -213,9 +213,9 @@
   依存: 2-22e
 - [x] **2-22j** SOLD OUT 表示 UI: `app/components/shop/SoldOutBadge.vue` 新設 (size: `card` / `detail` の 2 種類) + `ShopProductCard.vue` / `app/pages/shop/[slug].vue` / `app/pages/cart.vue` に組み込み。商品詳細では「カートに入れる」ボタンを SOLD OUT 表示 + disabled、数量ステッパも disabled。カートでは `/api/products` から最新在庫を取得し、SOLD OUT アイテムのステッパと決済ボタンを disabled + 警告メッセージ表示。`/api/products` 失敗時は決済を許可し checkout API 側 (2-22l) で再検証する設計  
   依存: 2-22i
-- [ ] **2-22k** Pinia カートストア (`app/stores/cart.ts`) の `addItem` / `updateQuantity` に `stock` 上限制約を追加し、超過時は `useToast` で「在庫が不足しています」を表示  
+- [x] **2-22k** Pinia カートストア (`app/stores/cart.ts`) の `addItem` / `updateQuantity` に `stock` 上限制約を追加し、超過時は `useToast` で「在庫が不足しています」を表示 (`stock` 未指定時は制約なしで checkout API 側 (2-22l) で再検証する設計)。`shop/[slug].vue` の `addItem` 呼び出しと `cart.vue` の数量変更呼び出しに `stock` を渡すよう更新  
   依存: 2-22i
-- [ ] **2-22l** `server/api/checkout.post.ts` の事前検証に Notion 在庫再チェックを追加 (在庫 < 要求数なら 409 + 該当 slug を返す)  
+- [x] **2-22l** `server/api/checkout.post.ts` の事前検証に Notion 在庫再チェックを追加 (`fetchAllStock()` で 10 分キャッシュを通さず最新値で照合、在庫 < 要求数の slug を集約して 409 + `{ slug, name, requested, available }` の配列を返す。Notion 障害時は事後検知 (Webhook の `stock_processed` + `flagShortage`) に委ねて続行)  
   依存: 2-22e
 - [ ] **2-22m** `server/api/webhooks/stripe.post.ts` の `checkout.session.completed` ハンドラ実装: 注文 DB に session_id で upsert → `stock_processed = false` なら line_items を `expand` で取得 → `price.lookup_key` から slug 解決 → 各 slug で `decrementStock(slug, quantity)` → 結果が負値なら `flagShortage` + 管理者通知メール (Resend) → 注文 DB の `stock_processed = true` を立てる → `products` キャッシュタグを無効化  
   依存: 2-22c, 2-22e, 2-23

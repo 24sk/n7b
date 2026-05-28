@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { fetchAllStock } from '~~/server/utils/notion-inventory'
 import { getProductBySlug } from '~~/server/utils/products'
 import { buildShippingOptions, resolveBillingShippingSize } from '~~/server/utils/shipping'
 import { useStripe } from '~~/server/utils/stripe'
@@ -24,6 +25,34 @@ export default defineEventHandler(async (event) => {
     }
     return { product, quantity: item.quantity }
   }))
+
+  // Notion 在庫を直接再チェック (10 分キャッシュを通さず最新値で照合)。
+  // Notion 障害時は許容して続行 — Webhook 側で `stock_processed` + `flagShortage` で事後検知する
+  try {
+    const stockRows = await fetchAllStock()
+    const stockMap = new Map(stockRows.map(r => [r.slug, r.stock]))
+    const shortages = resolved
+      .map(({ product, quantity }) => ({
+        slug: product.slug,
+        name: product.name,
+        requested: quantity,
+        available: stockMap.get(product.slug) ?? 0,
+      }))
+      .filter(s => s.available < s.requested)
+    if (shortages.length > 0) {
+      throw createError({
+        statusCode: 409,
+        statusMessage: '在庫が不足しています',
+        data: { shortages },
+      })
+    }
+  }
+  catch (err: unknown) {
+    // 上で throw した 409 はそのまま伝搬させる
+    if (typeof err === 'object' && err !== null && 'statusCode' in err && (err as { statusCode: number }).statusCode === 409)
+      throw err
+    console.error('[checkout] Notion 在庫再チェック失敗。許容して続行', err)
+  }
 
   const lineItems = resolved.map(({ product, quantity }) => ({
     price: product.priceId,

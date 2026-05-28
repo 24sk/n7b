@@ -24,7 +24,7 @@ const isSoldOut = computed(() => (product.value?.stock ?? 0) <= 0)
 function addToCart() {
   if (!product.value || isSoldOut.value)
     return
-  cart.addItem(product.value, quantity.value)
+  cart.addItem(product.value, quantity.value, { stock: product.value.stock })
   toast.add({
     title: 'カートに追加しました',
     description: `${product.value.name} × ${quantity.value}`,

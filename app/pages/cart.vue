@@ -28,16 +28,20 @@ function isSoldOut(slug: string): boolean {
 }
 const hasSoldOutItem = computed(() => cart.items.some(item => isSoldOut(item.slug)))
 
+function currentStock(slug: string): number | undefined {
+  return stockBySlug.value?.get(slug)
+}
+
 function changeQuantity(slug: string, value: number) {
-  cart.updateQuantity(slug, value)
+  cart.updateQuantity(slug, value, currentStock(slug))
 }
 
 function increment(slug: string, current: number) {
-  cart.updateQuantity(slug, current + 1)
+  cart.updateQuantity(slug, current + 1, currentStock(slug))
 }
 
 function decrement(slug: string, current: number) {
-  cart.updateQuantity(slug, current - 1)
+  cart.updateQuantity(slug, current - 1, currentStock(slug))
 }
 
 async function proceedToCheckout() {

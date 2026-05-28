@@ -5,6 +5,23 @@ import { CONSUMPTION_TAX_RATE } from '~~/shared/types/cart'
 interface AddOptions {
   /** 加算するか上書きするか (デフォルト: 加算) */
   mode?: 'increment' | 'set'
+  /**
+   * 上限在庫数。指定すると要求数を `stock` で clamp し、超過時は useToast で警告を出す。
+   * 未指定 (Notion 障害等で stock が不明) の場合は制約なし — checkout API 側で再検証する。
+   */
+  stock?: number
+}
+
+function notifyStockShortage(name: string, max: number) {
+  const toast = useToast()
+  toast.add({
+    title: '在庫が不足しています',
+    description: max <= 0
+      ? `${name} は在庫切れです。`
+      : `${name} は残り ${max} 個までです。`,
+    color: 'warning',
+    icon: 'i-lucide-alert-triangle',
+  })
 }
 
 export const useCartStore = defineStore('cart', {
@@ -20,13 +37,30 @@ export const useCartStore = defineStore('cart', {
   },
 
   actions: {
-    /** 商品をカートに追加 (既存があれば数量を加算 / set 指定で上書き) */
+    /** 商品をカートに追加 (既存があれば数量を加算 / set 指定で上書き)。`stock` 指定で在庫上限を強制する */
     addItem(input: CartSnapshotInput, quantity = 1, options: AddOptions = {}) {
       if (quantity <= 0)
         return
       const existing = this.items.find(item => item.slug === input.slug)
+      const requested = existing && options.mode !== 'set'
+        ? existing.quantity + quantity
+        : quantity
+
+      const stock = options.stock
+      let nextQuantity = requested
+      if (typeof stock === 'number') {
+        if (stock <= 0) {
+          notifyStockShortage(input.name, 0)
+          return
+        }
+        if (requested > stock) {
+          notifyStockShortage(input.name, stock)
+          nextQuantity = stock
+        }
+      }
+
       if (existing) {
-        existing.quantity = options.mode === 'set' ? quantity : existing.quantity + quantity
+        existing.quantity = nextQuantity
         return
       }
       this.items.push({
@@ -36,16 +70,21 @@ export const useCartStore = defineStore('cart', {
         taxIncluded: input.taxIncluded,
         image: input.images[0],
         priceId: input.priceId,
-        quantity,
+        quantity: nextQuantity,
       })
     },
 
-    updateQuantity(slug: string, quantity: number) {
+    updateQuantity(slug: string, quantity: number, stock?: number) {
       const item = this.items.find(i => i.slug === slug)
       if (!item)
         return
       if (quantity <= 0) {
         this.removeItem(slug)
+        return
+      }
+      if (typeof stock === 'number' && quantity > stock) {
+        notifyStockShortage(item.name, stock)
+        item.quantity = Math.max(stock, 1)
         return
       }
       item.quantity = quantity
