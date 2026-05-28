@@ -178,7 +178,7 @@
 
 ### Week 4: 注文管理と運用整備
 
-- [ ] **2-22** Notion に注文管理 DB 作成  
+- [x] **2-22** Notion に注文管理 DB 作成 (DB ID: `5bffda62-03ac-4ce9-9cc9-ae69947e10b3` / Session ID (TITLE) + ステータス / 支払い方法 / 顧客情報 / 配送先 / 商品 / 金額 / `stock_processed` / `在庫不足アラート` / `部分返金在庫要確認` を含む。2-22c の在庫管理フラグも同時に組み込み済み)  
   依存: 0-8
 - [ ] **2-23** Stripe Webhook ハンドラ内で `checkout.session.completed` を受け、Notion 注文 DB に登録する処理を実装  
   依存: 2-21, 2-22
@@ -188,11 +188,49 @@
   依存: 2-23
 - [ ] **2-25b** `charge.refunded` などの返金系イベントを受け、Notion 注文 DB のステータスを更新する処理を実装  
   依存: 2-23
+
+#### 在庫管理 (Notion 在庫 DB ↔ Stripe 自動同期)
+
+> **方針メモ (在庫管理)**: Stripe 上の商品は archive せず `active: true` のまま残し、Notion 在庫管理 DB の `在庫数` を Source of Truth として SOLD OUT 表示する。商品登録 (`pnpm stripe:seed`) と販売 (Stripe Webhook) の両方で Notion 在庫を自動同期する。Konbini 未払いでも `checkout.session.completed` 受信時点で在庫を引き当て、`async_payment_failed` / `session.expired` で復元する。冪等性は `2-22` の注文管理 DB に `stock_processed` フラグを置いて担保する。競合制御 (在庫マイナス) は完全防止せず、検知時に管理者通知 + Notion フラグで気付ける運用とする。
+
+- [x] **2-22a** Notion に在庫管理 DB を作成 (DB ID: `02494109-45fc-43a0-837c-0d6cdd69617b` / `Slug` (title) / `Stripe Product ID` / `商品名` / `カテゴリ` (tableware/lighting/stationery/apparel/craft/other) / `在庫数` / `初期在庫` / `ステータス` (formula: `if(prop("在庫数") > 0, "販売中", "SOLD OUT")`) / `要対応` / `Last Updated`)  
+  依存: 0-8
+- [ ] **2-22b** Notion Integration に在庫 DB の接続権限を付与し、`NOTION_INVENTORY_DB_ID` を `.env` / Vercel に登録  
+  依存: 0-9, 2-22a
+- [x] **2-22c** `2-22` (注文管理 DB) に `stock_processed` (checkbox) と `在庫不足アラート` (checkbox) を含める設計に更新 (2-22 作成時にスキーマへ組み込み済み。`部分返金在庫要確認` も同時に追加)  
+  依存: 2-22
+- [ ] **2-22d** `nuxt.config.ts` の `runtimeConfig` に `notionInventoryDbId` / `notionOrderDbId` / `inventoryAlertTo` を追加し、`.env.example` を更新  
+  依存: 2-22b
+- [ ] **2-22e** `server/utils/notion-inventory.ts` 新設 (`fetchAllStock()` / `getStockBySlug()` / `decrementStock(slug, by)` / `incrementStock(slug, by)` / `flagShortage(slug)`)  
+  依存: 2-22d
+- [ ] **2-22f** `scripts/products/*.json` の Zod スキーマに `initialStock: z.number().int().nonnegative().default(1)` を追加し、`pnpm product:add` 対話フローに「初期在庫数」プロンプトを配送サイズの直後に挿入  
+  依存: 2-2
+- [ ] **2-22g** `scripts/seed-stripe-products.ts` を拡張: Stripe 登録後に Notion 在庫 DB を slug キーで upsert (既存行があれば在庫数は触らず Stripe Product ID と商品名のみ更新)  
+  依存: 2-22b, 2-22f
+- [ ] **2-22h** 既存商品 `crochet-bear-nanako` を `pnpm stripe:seed --reseed` で Notion 在庫 DB に初期投入し、在庫数を手動で設定  
+  依存: 2-22g
+- [ ] **2-22i** `shared/types/product.ts` の `Product` インターフェイスに `stock: number` を追加し、`server/utils/products.ts:fetchAllFromStripe` で Notion 在庫を join (`fetchAllStock()` を 1 回呼んで slug → stock の Map を作って各 Product に埋める)  
+  依存: 2-22e
+- [ ] **2-22j** SOLD OUT 表示 UI: `app/components/shop/SoldOutBadge.vue` 新設 + `ShopProductCard.vue` / `app/pages/shop/[slug].vue` / `app/pages/cart.vue` に組み込み (画像オーバーレイ + 「カートに入れる」ボタン disabled + ステッパ disabled)  
+  依存: 2-22i
+- [ ] **2-22k** Pinia カートストア (`app/stores/cart.ts`) の `addItem` / `updateQuantity` に `stock` 上限制約を追加し、超過時は `useToast` で「在庫が不足しています」を表示  
+  依存: 2-22i
+- [ ] **2-22l** `server/api/checkout.post.ts` の事前検証に Notion 在庫再チェックを追加 (在庫 < 要求数なら 409 + 該当 slug を返す)  
+  依存: 2-22e
+- [ ] **2-22m** `server/api/webhooks/stripe.post.ts` の `checkout.session.completed` ハンドラ実装: 注文 DB に session_id で upsert → `stock_processed = false` なら line_items を `expand` で取得 → `price.lookup_key` から slug 解決 → 各 slug で `decrementStock(slug, quantity)` → 結果が負値なら `flagShortage` + 管理者通知メール (Resend) → 注文 DB の `stock_processed = true` を立てる → `products` キャッシュタグを無効化  
+  依存: 2-22c, 2-22e, 2-23
+- [ ] **2-22n** `checkout.session.async_payment_failed` / `checkout.session.expired` ハンドラ実装: 注文 DB から該当 session_id を引き、`stock_processed = true` なら各 slug で `incrementStock(slug, quantity)` (引き当て解除) → 注文 DB の `stock_processed = false` に戻し、ステータスを「失敗」または「期限切れ」に更新  
+  依存: 2-22m
+- [ ] **2-22o** `charge.refunded` ハンドラに在庫戻し処理を追加 (全額返金時のみ自動で `incrementStock`、部分返金は注文 DB に「部分返金 - 在庫要確認」フラグを立てるのみで自動操作しない)  
+  依存: 2-22m, 2-25b
+- [ ] **2-22p** ローカル & test モードで E2E テスト: 商品登録 (`pnpm product:add` → `pnpm stripe:seed`) で Notion 行が作られる → 在庫を 1 に設定 → 1 個購入で 0 → SOLD OUT 表示 → 同時に 2 個目購入を試みると Checkout API が 409 を返す、までを確認  
+  依存: 2-22h〜2-22o
+
 - [ ] **2-26** 返品・キャンセル運用ルールを策定しドキュメント化
 - [ ] **2-30** Footer に法的ページへのリンクを追加  
   依存: 1-7, 0-19, 0-20, 0-21
 - [ ] **2-31** Stripe を本番モードに切り替え（環境変数差し替え）  
-  依存: 0-5, 2-1〜2-25b
+  依存: 0-5, 2-1〜2-25b, 2-22a〜2-22p
 - [ ] **2-32** 本番モードで自己決済テスト（少額購入で全フロー検証）  
   依存: 2-31
 
