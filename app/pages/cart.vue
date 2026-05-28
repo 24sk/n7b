@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Product } from '~~/shared/types/product'
 import { calcInclusiveTax, useCartStore } from '~/stores/cart'
 
 const cart = useCartStore()
@@ -9,6 +10,23 @@ const jpy = new Intl.NumberFormat('ja-JP')
 const taxAmount = computed(() => calcInclusiveTax(cart.subtotal))
 
 const checkoutPending = ref(false)
+
+// 最新の在庫数を取得して SOLD OUT 判定する (カート内で完売した商品の決済を防ぐ)
+// API 失敗時は stockBySlug が null → 不明扱いで決済を許可し、サーバ側 (2-22l) で再検証する
+const { data: products } = await useFetch<Product[]>('/api/products')
+const stockBySlug = computed(() => {
+  if (!products.value)
+    return null
+  return new Map(products.value.map(p => [p.slug, p.stock]))
+})
+function isSoldOut(slug: string): boolean {
+  if (!stockBySlug.value)
+    return false
+  const stock = stockBySlug.value.get(slug)
+  // /api/products から消えている (archive 等) は SOLD OUT 扱い
+  return stock === undefined ? true : stock <= 0
+}
+const hasSoldOutItem = computed(() => cart.items.some(item => isSoldOut(item.slug)))
 
 function changeQuantity(slug: string, value: number) {
   cart.updateQuantity(slug, value)
@@ -95,7 +113,7 @@ usePageSeo({
             >
               <NuxtLink
                 :to="`/shop/${item.slug}`"
-                class="block aspect-square w-24 shrink-0 overflow-hidden rounded-md bg-neutral-100 sm:w-32"
+                class="relative block aspect-square w-24 shrink-0 overflow-hidden rounded-md bg-neutral-100 sm:w-32"
               >
                 <NuxtImg
                   v-if="item.image"
@@ -110,6 +128,7 @@ usePageSeo({
                 <div v-else class="flex h-full w-full items-center justify-center text-teal-700/40">
                   <UIcon name="i-lucide-image" class="size-8" />
                 </div>
+                <SoldOutBadge v-if="isSoldOut(item.slug)" size="card" />
               </NuxtLink>
 
               <div class="flex min-w-0 flex-1 flex-col">
@@ -128,7 +147,7 @@ usePageSeo({
                     <button
                       type="button"
                       class="flex size-8 items-center justify-center text-neutral-700 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40"
-                      :disabled="item.quantity <= 1"
+                      :disabled="isSoldOut(item.slug) || item.quantity <= 1"
                       :aria-label="`${item.name} の数量を1減らす`"
                       @click="decrement(item.slug, item.quantity)"
                     >
@@ -139,13 +158,15 @@ usePageSeo({
                       type="number"
                       min="1"
                       inputmode="numeric"
-                      class="w-12 border-x border-neutral-300 bg-white py-1 text-center text-caption text-neutral-900 focus:outline-none focus:ring-2 focus:ring-teal-100"
+                      :disabled="isSoldOut(item.slug)"
+                      class="w-12 border-x border-neutral-300 bg-white py-1 text-center text-caption text-neutral-900 focus:outline-none focus:ring-2 focus:ring-teal-100 disabled:cursor-not-allowed disabled:opacity-40"
                       :aria-label="`${item.name} の数量`"
                       @change="changeQuantity(item.slug, Number(($event.target as HTMLInputElement).value) || 0)"
                     >
                     <button
                       type="button"
-                      class="flex size-8 items-center justify-center text-neutral-700 transition-colors hover:bg-neutral-100"
+                      class="flex size-8 items-center justify-center text-neutral-700 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40"
+                      :disabled="isSoldOut(item.slug)"
                       :aria-label="`${item.name} の数量を1増やす`"
                       @click="increment(item.slug, item.quantity)"
                     >
@@ -203,11 +224,14 @@ usePageSeo({
                 class="mt-6"
                 icon="i-lucide-credit-card"
                 :loading="checkoutPending"
-                :disabled="checkoutPending"
+                :disabled="checkoutPending || hasSoldOutItem"
                 @click="proceedToCheckout"
               >
                 レジに進む
               </UButton>
+              <p v-if="hasSoldOutItem" class="mt-3 text-caption text-error">
+                在庫切れの商品があります。該当の商品をカートから削除してから決済に進んでください。
+              </p>
               <p class="mt-3 text-caption text-neutral-500">
                 クレジットカードまたはコンビニ決済でお支払いいただけます。配送料は次の画面で配送先地域に応じて選択できます。
               </p>

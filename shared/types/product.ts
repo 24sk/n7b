@@ -42,4 +42,6 @@ export interface Product {
   priceId: string
   /** ヤマト宅急便規格 (送料計算に使用) */
   shippingSize: ShippingSize
+  /** Notion 在庫管理 DB から取得した現在の在庫数。Notion 接続不能時はフォールバック値 (大きい数) が入る */
+  stock: number
 }

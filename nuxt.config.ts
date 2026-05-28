@@ -53,6 +53,8 @@ export default defineNuxtConfig({
     notionApiToken: process.env.NOTION_API_TOKEN ?? '',
     notionContactDbId: process.env.NOTION_CONTACT_DB_ID ?? '',
     notionNewsDbId: process.env.NOTION_NEWS_DB_ID ?? '',
+    notionOrderDbId: process.env.NOTION_ORDER_DB_ID ?? '',
+    notionInventoryDbId: process.env.NOTION_INVENTORY_DB_ID ?? '',
     resendApiKey: process.env.RESEND_API_KEY ?? '',
     resendAudienceId: process.env.RESEND_AUDIENCE_ID ?? '',
     stripeSecretKey: process.env.STRIPE_SECRET_KEY ?? '',
@@ -61,6 +63,7 @@ export default defineNuxtConfig({
     newsletterFrom: 'noreply@nango7base.jp',
     contactNotificationTo: 'contact@nango7base.jp',
     contactNotificationFrom: 'noreply@nango7base.jp',
+    inventoryAlertTo: 'contact@nango7base.jp',
     turnstile: {
       secretKey: '',
     },

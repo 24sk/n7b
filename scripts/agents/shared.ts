@@ -108,6 +108,8 @@ export interface ProductMetadata {
   priceJpy: number
   /** ヤマト宅急便規格 (送料計算に使用) */
   shippingSize: ShippingSize
+  /** Notion 在庫管理 DB の初期在庫 (在庫数フィールドの初期値) */
+  initialStock: number
 }
 
 export function tryParseToolInput<T>(

@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import type { Product } from '~~/shared/types/product'
 
-defineProps<{
+const props = defineProps<{
   product: Product
 }>()
 
 const jpy = new Intl.NumberFormat('ja-JP')
+const isSoldOut = computed(() => props.product.stock <= 0)
 </script>
 
 <template>
   <article class="group flex h-full flex-col">
     <NuxtLink :to="`/shop/${product.slug}`" class="block">
-      <div class="aspect-square overflow-hidden rounded-lg bg-neutral-100">
+      <div class="relative aspect-square overflow-hidden rounded-lg bg-neutral-100">
         <NuxtImg
           v-if="product.images[0]"
           :src="product.images[0]"
@@ -20,11 +21,13 @@ const jpy = new Intl.NumberFormat('ja-JP')
           height="800"
           format="webp"
           loading="lazy"
-          class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          class="h-full w-full object-cover transition-transform duration-300"
+          :class="isSoldOut ? '' : 'group-hover:scale-105'"
         />
         <div v-else class="flex h-full w-full items-center justify-center text-teal-700/40">
           <UIcon name="i-lucide-image" class="size-12" />
         </div>
+        <SoldOutBadge v-if="isSoldOut" size="card" />
       </div>
     </NuxtLink>
 

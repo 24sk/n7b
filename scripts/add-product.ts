@@ -118,6 +118,22 @@ async function askShippingSize(defaultSize: ShippingSize = 60): Promise<Shipping
   }
 }
 
+async function askInitialStock(defaultStock = 1): Promise<number> {
+  if (AUTO_YES) {
+    process.stdout.write(`初期在庫数 [${defaultStock}]: ${defaultStock} (auto)\n`)
+    return defaultStock
+  }
+  while (true) {
+    const ans = (await rl.question(`初期在庫数 (Notion 在庫管理 DB の在庫数の初期値) [${defaultStock}]: `)).trim()
+    if (ans === '')
+      return defaultStock
+    const n = Number.parseInt(ans, 10)
+    if (Number.isFinite(n) && n >= 0)
+      return n
+    console.log('  ✖ 0 以上の整数で入力してください')
+  }
+}
+
 function listExistingSlugs(): string[] {
   if (!existsSync(PRODUCTS_JSON_DIR))
     return []
@@ -202,6 +218,7 @@ console.log('────────────────────\n')
 
 const priceJpy = overridePrice ?? await askPrice(priceResult.recommended, priceResult.min, priceResult.max)
 const shippingSize = await askShippingSize()
+const initialStock = await askInitialStock()
 const ok = await confirm('この内容で登録しますか? [Y/n]: ', true)
 if (!ok) {
   console.log('キャンセルしました (画像は inbox に残っています)')
@@ -217,6 +234,7 @@ const product: ProductMetadata = {
   category,
   priceJpy,
   shippingSize,
+  initialStock,
 }
 
 commitToAssetsRaw(prepared, PRODUCTS_SRC_DIR, product.slug, inboxDir)

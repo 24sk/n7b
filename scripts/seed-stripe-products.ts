@@ -30,6 +30,8 @@ export const ProductSchema = z.object({
   storySlug: z.string().optional(),
   /** ヤマト宅急便規格 (送料計算に使用) */
   shippingSize: z.union([z.literal(60), z.literal(80), z.literal(100), z.literal(120), z.literal(140), z.literal(160)]),
+  /** Notion 在庫管理 DB の初期在庫 (upsert 時は触らない。新規行のみ初期値として利用) */
+  initialStock: z.number().int().nonnegative().default(1),
 })
 export type ProductConfig = z.infer<typeof ProductSchema>
 
@@ -139,6 +141,75 @@ async function upsertProduct(p: ProductConfig): Promise<void> {
     })
     await stripe.products.update(product.id, { default_price: price.id })
     console.log(`  ✓ ${p.slug}  (Product=${product.id}, Price=${price.id} [new])`)
+  }
+
+  await upsertInventoryRow(p, product.id)
+}
+
+// ─── Notion 在庫管理 DB 同期 ───────────────────────────
+let notionClient: NotionClient | null = null
+let inventoryDataSourceId: string | null = null
+
+function getNotionInventory(): { notion: NotionClient, databaseId: string } | null {
+  const apiToken = process.env.NOTION_API_TOKEN
+  const databaseId = process.env.NOTION_INVENTORY_DB_ID
+  if (!apiToken || !databaseId)
+    return null
+  if (!notionClient)
+    notionClient = new NotionClient({ auth: apiToken })
+  return { notion: notionClient, databaseId }
+}
+
+async function resolveInventoryDataSourceId(notion: NotionClient, databaseId: string): Promise<string> {
+  if (inventoryDataSourceId)
+    return inventoryDataSourceId
+  const db = await notion.databases.retrieve({ database_id: databaseId })
+  if (!('data_sources' in db) || !db.data_sources.length)
+    throw new Error(`Notion inventory DB ${databaseId} has no data sources`)
+  inventoryDataSourceId = db.data_sources[0]!.id
+  return inventoryDataSourceId
+}
+
+/**
+ * Notion 在庫管理 DB に slug キーで upsert。
+ * - 既存行: `Stripe Product ID` と `商品名` のみ更新 (在庫数は触らない)
+ * - 新規行: 全プロパティを作成し、`在庫数` / `初期在庫` の両方に `initialStock` を設定
+ */
+async function upsertInventoryRow(p: ProductConfig, stripeProductId: string): Promise<void> {
+  const ni = getNotionInventory()
+  if (!ni) {
+    console.warn(`    └ Notion 在庫: NOTION_API_TOKEN または NOTION_INVENTORY_DB_ID が未設定のためスキップ`)
+    return
+  }
+  const dataSourceId = await resolveInventoryDataSourceId(ni.notion, ni.databaseId)
+  const found = await ni.notion.dataSources.query({
+    data_source_id: dataSourceId,
+    page_size: 1,
+    filter: { property: 'Slug', title: { equals: p.slug } },
+  })
+  const page = found.results.find(isFullPage)
+  if (page) {
+    const properties: UpdatePageParameters['properties'] = {
+      'Stripe Product ID': { rich_text: [{ text: { content: stripeProductId } }] },
+      '商品名': { rich_text: [{ text: { content: p.name } }] },
+    }
+    await ni.notion.pages.update({ page_id: page.id, properties })
+    console.log(`    └ Notion 在庫: ${p.slug} を更新 (在庫数は保持)`)
+  }
+  else {
+    const properties: CreatePageParameters['properties'] = {
+      'Slug': { title: [{ text: { content: p.slug } }] },
+      'Stripe Product ID': { rich_text: [{ text: { content: stripeProductId } }] },
+      '商品名': { rich_text: [{ text: { content: p.name } }] },
+      'カテゴリ': { select: { name: p.category } },
+      '在庫数': { number: p.initialStock },
+      '初期在庫': { number: p.initialStock },
+    }
+    await ni.notion.pages.create({
+      parent: { database_id: ni.databaseId },
+      properties,
+    })
+    console.log(`    └ Notion 在庫: ${p.slug} を新規作成 (在庫数=${p.initialStock})`)
   }
 }
 

@@ -195,23 +195,23 @@
 
 - [x] **2-22a** Notion に在庫管理 DB を作成 (DB ID: `02494109-45fc-43a0-837c-0d6cdd69617b` / `Slug` (title) / `Stripe Product ID` / `商品名` / `カテゴリ` (tableware/lighting/stationery/apparel/craft/other) / `在庫数` / `初期在庫` / `ステータス` (formula: `if(prop("在庫数") > 0, "販売中", "SOLD OUT")`) / `要対応` / `Last Updated`)  
   依存: 0-8
-- [ ] **2-22b** Notion Integration に在庫 DB の接続権限を付与し、`NOTION_INVENTORY_DB_ID` を `.env` / Vercel に登録  
+- [x] **2-22b** Notion Integration に在庫 DB の接続権限を付与し、`NOTION_INVENTORY_DB_ID` を `.env` / Vercel に登録  
   依存: 0-9, 2-22a
 - [x] **2-22c** `2-22` (注文管理 DB) に `stock_processed` (checkbox) と `在庫不足アラート` (checkbox) を含める設計に更新 (2-22 作成時にスキーマへ組み込み済み。`部分返金在庫要確認` も同時に追加)  
   依存: 2-22
-- [ ] **2-22d** `nuxt.config.ts` の `runtimeConfig` に `notionInventoryDbId` / `notionOrderDbId` / `inventoryAlertTo` を追加し、`.env.example` を更新  
+- [x] **2-22d** `nuxt.config.ts` の `runtimeConfig` に `notionInventoryDbId` / `notionOrderDbId` を追加 (`inventoryAlertTo` は `contactNotificationTo` と同じく `contact@nango7base.jp` をハードコード)。`.env.example` には 2-22 / 2-22a で既に `NOTION_ORDER_DB_ID` / `NOTION_INVENTORY_DB_ID` を実 ID で記載済  
   依存: 2-22b
-- [ ] **2-22e** `server/utils/notion-inventory.ts` 新設 (`fetchAllStock()` / `getStockBySlug()` / `decrementStock(slug, by)` / `incrementStock(slug, by)` / `flagShortage(slug)`)  
+- [x] **2-22e** `server/utils/notion-inventory.ts` 新設 (`fetchAllStock()` / `getStockBySlug()` / `decrementStock(slug, by)` / `incrementStock(slug, by)` / `flagShortage(slug)`。`InventoryRow` 型を export。`Slug` (title) でフィルタ、`在庫数` を増減、競合は楽観制御でマイナス時に `要対応` フラグを呼び元が立てる方針)  
   依存: 2-22d
-- [ ] **2-22f** `scripts/products/*.json` の Zod スキーマに `initialStock: z.number().int().nonnegative().default(1)` を追加し、`pnpm product:add` 対話フローに「初期在庫数」プロンプトを配送サイズの直後に挿入  
+- [x] **2-22f** `scripts/products/*.json` の Zod スキーマに `initialStock: z.number().int().nonnegative().default(1)` を追加し、`pnpm product:add` 対話フローに「初期在庫数」プロンプトを配送サイズの直後に挿入。`ProductMetadata` 型 (scripts/agents/shared.ts) にも `initialStock: number` を追加。既存の `crochet-bear-nanako.json` には明示的に `"initialStock": 1` を追記済  
   依存: 2-2
-- [ ] **2-22g** `scripts/seed-stripe-products.ts` を拡張: Stripe 登録後に Notion 在庫 DB を slug キーで upsert (既存行があれば在庫数は触らず Stripe Product ID と商品名のみ更新)  
+- [x] **2-22g** `scripts/seed-stripe-products.ts` を拡張: Stripe 登録後に Notion 在庫 DB を slug キーで upsert (既存行があれば在庫数は触らず Stripe Product ID と商品名のみ更新。新規行は `在庫数` / `初期在庫` の両方に `initialStock` を投入し、カテゴリも設定。`NOTION_API_TOKEN` / `NOTION_INVENTORY_DB_ID` 未設定時は警告ログを出してスキップ)  
   依存: 2-22b, 2-22f
 - [ ] **2-22h** 既存商品 `crochet-bear-nanako` を `pnpm stripe:seed --reseed` で Notion 在庫 DB に初期投入し、在庫数を手動で設定  
   依存: 2-22g
-- [ ] **2-22i** `shared/types/product.ts` の `Product` インターフェイスに `stock: number` を追加し、`server/utils/products.ts:fetchAllFromStripe` で Notion 在庫を join (`fetchAllStock()` を 1 回呼んで slug → stock の Map を作って各 Product に埋める)  
+- [x] **2-22i** `shared/types/product.ts` の `Product` インターフェイスに `stock: number` を追加し、`server/utils/products.ts:fetchAllFromStripe` で Notion 在庫を join (`fetchAllStock()` を 1 回呼んで slug → stock の Map を作って各 Product に埋める。Notion 障害時は `FALLBACK_STOCK = 9999` を入れて SOLD OUT 誤検知を回避し、checkout API 側 (2-22l) で再検証する設計。行なしは `0` で SOLD OUT 扱い)  
   依存: 2-22e
-- [ ] **2-22j** SOLD OUT 表示 UI: `app/components/shop/SoldOutBadge.vue` 新設 + `ShopProductCard.vue` / `app/pages/shop/[slug].vue` / `app/pages/cart.vue` に組み込み (画像オーバーレイ + 「カートに入れる」ボタン disabled + ステッパ disabled)  
+- [x] **2-22j** SOLD OUT 表示 UI: `app/components/shop/SoldOutBadge.vue` 新設 (size: `card` / `detail` の 2 種類) + `ShopProductCard.vue` / `app/pages/shop/[slug].vue` / `app/pages/cart.vue` に組み込み。商品詳細では「カートに入れる」ボタンを SOLD OUT 表示 + disabled、数量ステッパも disabled。カートでは `/api/products` から最新在庫を取得し、SOLD OUT アイテムのステッパと決済ボタンを disabled + 警告メッセージ表示。`/api/products` 失敗時は決済を許可し checkout API 側 (2-22l) で再検証する設計  
   依存: 2-22i
 - [ ] **2-22k** Pinia カートストア (`app/stores/cart.ts`) の `addItem` / `updateQuantity` に `stock` 上限制約を追加し、超過時は `useToast` で「在庫が不足しています」を表示  
   依存: 2-22i

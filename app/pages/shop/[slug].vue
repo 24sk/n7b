@@ -19,8 +19,10 @@ const jpy = new Intl.NumberFormat('ja-JP')
 const cart = useCartStore()
 const toast = useToast()
 
+const isSoldOut = computed(() => (product.value?.stock ?? 0) <= 0)
+
 function addToCart() {
-  if (!product.value)
+  if (!product.value || isSoldOut.value)
     return
   cart.addItem(product.value, quantity.value)
   toast.add({
@@ -56,7 +58,7 @@ usePageSeo({
 
         <div class="grid gap-10 lg:grid-cols-2 lg:gap-16">
           <div class="space-y-4">
-            <div class="aspect-square overflow-hidden rounded-lg bg-neutral-100">
+            <div class="relative aspect-square overflow-hidden rounded-lg bg-neutral-100">
               <NuxtImg
                 v-if="product.images[activeImageIndex]"
                 :src="product.images[activeImageIndex]"
@@ -69,6 +71,7 @@ usePageSeo({
               <div v-else class="flex h-full w-full items-center justify-center text-teal-700/40">
                 <UIcon name="i-lucide-image" class="size-16" />
               </div>
+              <SoldOutBadge v-if="isSoldOut" size="detail" />
             </div>
 
             <ul v-if="product.images.length > 1" class="grid grid-cols-5 gap-2">
@@ -121,7 +124,7 @@ usePageSeo({
                   <button
                     type="button"
                     class="flex size-9 items-center justify-center text-neutral-700 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40"
-                    :disabled="quantity <= 1"
+                    :disabled="isSoldOut || quantity <= 1"
                     aria-label="数量を1減らす"
                     @click="quantity = Math.max(1, quantity - 1)"
                   >
@@ -133,12 +136,14 @@ usePageSeo({
                     type="number"
                     min="1"
                     inputmode="numeric"
-                    class="w-14 border-x border-neutral-300 bg-white py-1.5 text-center text-body text-neutral-900 focus:outline-none focus:ring-2 focus:ring-teal-100"
+                    :disabled="isSoldOut"
+                    class="w-14 border-x border-neutral-300 bg-white py-1.5 text-center text-body text-neutral-900 focus:outline-none focus:ring-2 focus:ring-teal-100 disabled:cursor-not-allowed disabled:opacity-40"
                     aria-label="数量"
                   >
                   <button
                     type="button"
-                    class="flex size-9 items-center justify-center text-neutral-700 transition-colors hover:bg-neutral-100"
+                    class="flex size-9 items-center justify-center text-neutral-700 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    :disabled="isSoldOut"
                     aria-label="数量を1増やす"
                     @click="quantity = quantity + 1"
                   >
@@ -150,11 +155,11 @@ usePageSeo({
                 color="primary"
                 size="lg"
                 block
-                icon="i-lucide-shopping-bag"
-                :disabled="quantity < 1"
+                :icon="isSoldOut ? 'i-lucide-ban' : 'i-lucide-shopping-bag'"
+                :disabled="isSoldOut || quantity < 1"
                 @click="addToCart"
               >
-                カートに入れる
+                {{ isSoldOut ? 'SOLD OUT' : 'カートに入れる' }}
               </UButton>
             </div>
 
