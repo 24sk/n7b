@@ -41,13 +41,13 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^3.0.0",
+    "@antfu/eslint-config": "^9.3.0",
     "@anthropic-ai/sdk": "^0.98.0",
     "@iconify-json/lucide": "^1.2.109",
     "@nuxt/eslint": "^1.0.0",
     "@nuxt/hints": "^1.1.2",
     "better-sqlite3": "^12.10.0",
-    "eslint": "^9.0.0",
+    "eslint": "^10.8.1",
     "eslint-plugin-format": "^2.0.1",
     "lefthook": "^2.1.8",
     "openai": "^6.39.0",
